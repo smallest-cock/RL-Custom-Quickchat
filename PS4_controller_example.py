@@ -130,11 +130,11 @@ while True:
         for event in pygame.event.get():
             if event.type == pygame.JOYBUTTONDOWN:
 
+    # ------------ Edit the code below to change macros, spam amounts, or if you made changes to the length/order of the quickchats list above -----------------------
+                
                 toggleMacros('ps') # <-- 'ps' is the button used to toggle on/off quick chat macros (PlayStation button)..... change as you please
 
                 if macrosOn:
-
-# ------------ Edit the code below to change macros, spam amounts, or if you made changes to the length/order of the quickchats list above -----------------------
 
                     # on square + up, types 1st chat in quickchats list
                     if combine('square', 'up'):
