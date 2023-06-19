@@ -19,7 +19,7 @@ Enables custom quick chats in Rocket League using controller macros
 7. Right-click the file -> Create shortcut
 8. Right-click the shortcut -> Properties -> Target: -> add the word "python" to the beginning, so it looks like: `python "C:\Users\....."`. Click Apply.
     - You can also change Run: -> Minimized to have it start minimized
-9. Leave the script running any time you want to use custom quick chats
+9. Leave the script running any time you want to use custom quick chats :)
 
 ## Support
 [Buy me a coffee ☕](https://cash.app/$naptime559) <3
