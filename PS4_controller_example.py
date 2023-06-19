@@ -53,13 +53,11 @@ firstButtonPressed = {
     'time': 420
 }
 
+macrosOn = True
+
 def resetFirstButtonPressed():
     firstButtonPressed['button'] = None     
     firstButtonPressed['time'] = 420
-
-pygame.init()
-pygame.joystick.init()
-joysticks = [pygame.joystick.Joystick(i) for i in range(pygame.joystick.get_count())]
 
 # detects simultaneous button presses
 def combine(button1, button2):
@@ -109,6 +107,20 @@ def quickchat(thing, chatMode='lobby', spamCount=1):
         print(f'[{chatMode}]    {thing}\n')
         time.sleep(chatSpamInterval)
 
+def toggleMacros(button):
+    if joysticks[0].get_button(buttons[button]):
+        global macrosOn
+        macrosOn = not macrosOn
+        if macrosOn:
+            print('----- quickchat macros toggled on -----\n')
+        else:
+            print('----- quickchat macros toggled off -----\n')
+        time.sleep(.2)
+
+pygame.init()
+pygame.joystick.init()
+joysticks = [pygame.joystick.Joystick(i) for i in range(pygame.joystick.get_count())]
+
 for controller in joysticks:
     if controller.get_init() == True:
         print(f"\n\n~~~~~~ {controller.get_name()} detected ~~~~~~\n\nwaiting for quickchat inputs....\n\n")
@@ -118,67 +130,71 @@ while True:
         for event in pygame.event.get():
             if event.type == pygame.JOYBUTTONDOWN:
 
+                toggleMacros('ps') # <-- 'ps' is the button used to toggle on/off quick chat macros (PlayStation button)..... change as you please
+
+                if macrosOn:
+
 # ------------ Edit the code below to change macros, spam amounts, or if you made changes to the length/order of the quickchats list above -----------------------
 
-                # on square + up, types 1st chat in quickchats list
-                if combine('square', 'up'):
-                    quickchat(quickchats[0])
-                    break
-                
-                # on square + left, types 2nd chat in quickchats list (spamming 2 times)
-                elif combine('square', 'left'):
-                    quickchat(quickchats[1], spamCount=2)  # <-- the '2' parameter is how many times the chat will be spammed.. the max you can put is 3 (before RL gives a chat timeout)
-                    break
+                    # on square + up, types 1st chat in quickchats list
+                    if combine('square', 'up'):
+                        quickchat(quickchats[0])
+                        break
+                    
+                    # on square + left, types 2nd chat in quickchats list (spamming 2 times)
+                    elif combine('square', 'left'):
+                        quickchat(quickchats[1], spamCount=2)  # <-- the '2' parameter is how many times the chat will be spammed.. the max you can put is 3 (before RL gives a chat timeout)
+                        break
 
-                # on square + down, types 3rd chat in quickchats list
-                elif combine('square', 'down'):
-                    quickchat(quickchats[2])
-                    break
-                
-                # on square + right, types 4th chat in quickchats list
-                elif combine('square', 'right'):
-                    quickchat(quickchats[3])
-                    break
-                
-                # on circle + up, types 5th chat in quickchats list (using team chat)
-                elif combine('circle', 'up'):
-                    quickchat(quickchats[4], chatMode='team')
-                    break
-                
-                # on circle + left, types 6th chat in quickchats list
-                elif combine('circle', 'left'):
-                    quickchat(quickchats[5])
-                    break
-                
-                # on circle + down, types 7th chat in quickchats list
-                elif combine('circle', 'down'):
-                    quickchat(quickchats[6])
-                    break
-                
-                # on circle + down, types 8th chat in quickchats list  ...... you get the pattern
-                elif combine('circle', 'right'):
-                    quickchat(quickchats[7])
-                    break
-                
-                # on left -> left, types 9th chat in quickchats list
-                elif successive('left', 'left'):
-                    quickchat(quickchats[8])
-                    break
+                    # on square + down, types 3rd chat in quickchats list
+                    elif combine('square', 'down'):
+                        quickchat(quickchats[2])
+                        break
+                    
+                    # on square + right, types 4th chat in quickchats list
+                    elif combine('square', 'right'):
+                        quickchat(quickchats[3])
+                        break
+                    
+                    # on circle + up, types 5th chat in quickchats list (using team chat)
+                    elif combine('circle', 'up'):
+                        quickchat(quickchats[4], chatMode='team')
+                        break
+                    
+                    # on circle + left, types 6th chat in quickchats list
+                    elif combine('circle', 'left'):
+                        quickchat(quickchats[5])
+                        break
+                    
+                    # on circle + down, types 7th chat in quickchats list
+                    elif combine('circle', 'down'):
+                        quickchat(quickchats[6])
+                        break
+                    
+                    # on circle + down, types 8th chat in quickchats list  ...... you get the pattern
+                    elif combine('circle', 'right'):
+                        quickchat(quickchats[7])
+                        break
+                    
+                    # on left -> left, types 9th chat in quickchats list
+                    elif successive('left', 'left'):
+                        quickchat(quickchats[8])
+                        break
 
-                # on up -> up, types 10th chat in quickchats list (using team chat, spamming 2 times)
-                elif successive('up', 'up'):
-                    quickchat(quickchats[9], chatMode='team', spamCount=2)
-                    break
-                
-                # on up -> right, types 11th chat in quickchats list (using party chat)
-                elif successive('up', 'right'):
-                    quickchat(quickchats[10], chatMode='party')
-                    break
+                    # on up -> up, types 10th chat in quickchats list (using team chat, spamming 2 times)
+                    elif successive('up', 'up'):
+                        quickchat(quickchats[9], chatMode='team', spamCount=2)
+                        break
+                    
+                    # on up -> right, types 11th chat in quickchats list (using party chat)
+                    elif successive('up', 'right'):
+                        quickchat(quickchats[10], chatMode='party')
+                        break
 
-                # on down -> left, types 12th chat in quickchats list
-                elif successive('down', 'left'):
-                    quickchat(quickchats[11])
-                    break
+                    # on down -> left, types 12th chat in quickchats list
+                    elif successive('down', 'left'):
+                        quickchat(quickchats[11])
+                        break
 
     except Exception as e:
         print(e)
