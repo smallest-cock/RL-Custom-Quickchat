@@ -18,7 +18,7 @@ quickchats = [
     'brb uninstalling...'
 ]
 
-# Time window given to read successive button presses (1.1 seconds).... you can change this as you please
+# Time window given for button sequence macros (1.1 seconds).... you can change this as you please
 macroTimeWindow = 1.1
 
 # Time interval between spammed chats (0.2 seconds).... change as you please
