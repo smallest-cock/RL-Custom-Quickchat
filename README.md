@@ -7,6 +7,8 @@ Enables custom quick chats in Rocket League using controller macros
 - Choose how many times to spam a chat
   - Customize spam interval (in seconds)
 - Specify chat mode (lobby/team/party)
+- Add word variations to spice up your chats
+  - e.g. "thx [friend]"  ............  where [friend] can be "homie", "bro", "dude", "playa", "my guy", etc.
 - Toggle quick chat macros on/off with one press of a button
   
 
