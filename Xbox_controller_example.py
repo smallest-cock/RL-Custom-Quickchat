@@ -1,8 +1,9 @@
 import time
 import pyautogui
 import pygame
+from random import randint
 
-# Change/add/remove these as you wish... but make sure any changes are reflected in the edit section below
+# Change/add/remove these as you wish (or dont use this list at all.... see examples below) Make sure any changes are reflected in the "edit" section below
 quickchats = [
     'noice',
     'dont lose this kickoff',
@@ -17,6 +18,19 @@ quickchats = [
     'im lagging',
     'it be like that'
 ]
+
+# Create your own word variations and format them like this (see examples on how to use them in the "edit" section below)
+variations = {
+    'friend': ['homie', 'blood', 'cuh', 'dawg', 'my guy', 'my man', 'nibba', 'my dude', 'comrade', 'playa', 'fellow gamer', 'brother', 'bro', 'bruh', 'buddy', 'bud', 'fellow human'],
+    'foe': ['clown', 'nerd', 'loser', 'bozo', 'small peen', 'tard', 'cringelord', 'idiot', 'bich', 'autist', 'dork', 'mouth breather', 'dumbass', 'virgin', 'fruitcake', 'weirdo', 'NPC'],
+    'compliment': ['noice', 'awesome', 'dank', 'fire', 'impressive', 'crispy', 'beautiful', 'sexy', 'clean', 'excellent', 'superb'],
+    'cat facts': ['Cats are believed to be the only mammals who don\'t taste sweetness.',   # <-- use " \' " in place of an apostrophe (to avoid the program crashing)
+                  'Cats can jump up to six times their length.',
+                  'Cats have 230 bones, while humans only have 206.',
+                  "Cats' rough tongues can lick a bone clean of any shred of meat.",    # <-- or just wrap the chat in double quotes ( "..." ) if it contains an apostrophe
+                  'Cats live longer when they stay indoors.',
+                  'Meowing is a behavior that cats developed exclusively to communicate with people.']
+}
 
 # Time window given to read button sequence macros (1.1 seconds).... you can change this as you please
 macroTimeWindow = 1.1
@@ -67,8 +81,8 @@ def combine(button1, button2):
     else:
         return False
 
-# Should detect successive button/hat presses (buttons pressed in a specific order)
-def successive(button1, button2):
+# Should detect sequence button/hat presses (buttons pressed in a specific order)
+def sequence(button1, button2):
     global firstButtonPressed
     functionCallTime = time.time()
 
@@ -117,6 +131,10 @@ def toggleMacros(button):
             print('----- quickchat macros toggled off -----\n')
         time.sleep(.2)
 
+def variation(key):
+    global variations
+    return variations[key][randint(0, (len(variations[key]) - 1))]
+
 pygame.init()
 pygame.joystick.init()
 joysticks = [pygame.joystick.Joystick(i) for i in range(pygame.joystick.get_count())]
@@ -130,7 +148,7 @@ while True:
         for event in pygame.event.get():
             if (event.type == pygame.JOYBUTTONDOWN) or (event.type == pygame.JOYHATMOTION):
 
-# ---------- Edit the code below to change macros, spam amounts, or if you made changes to the length/order of the quickchats list above -----------------------
+    # ---------- Edit the code below to change macros, spam amounts, chat modes, or if you made changes to the length/order of the quickchats list above -----------------------
 
                 toggleMacros('back') # <-- 'back' is the button used to toggle on/off quick chat macros (Xbox back button)..... change as you please
 
@@ -166,9 +184,9 @@ while True:
                         quickchat(quickchats[5])
                         break
 
-                    # on B + down, types 7th chat in quickchats list
+                    # on B + down, types "You dont need to use the quickchats list"
                     elif combine('b', 'down'):
-                        quickchat(quickchats[6])
+                        quickchat('You dont need to use the quickchats list')   # <-- You can write your quick chat here if preferred (as opposed to using the quickchats list above)
                         break
                     
                     # on B + down, types 8th chat in quickchats list  ...... you get the pattern
@@ -176,23 +194,33 @@ while True:
                         quickchat(quickchats[7])
                         break
 
-                    # on up -> up, types 9th chat in quickchats list
-                    elif successive('up', 'up'):
-                        quickchat(quickchats[8])
+                    # on left -> left, types "Word variations are [compliment]!"  ..... where [compliment] is a random word from the 'compliment' variations list above
+                    elif sequence('left', 'left'):
+                        quickchat(f'Word variations are {variation("compliment")}!')    # <-- One way to include word variations in your chats (notice the 'f' at the beginning of the string)
                         break
                     
                     # on up -> right, types 10th chat in quickchats list (using party chat, spamming 2 times)
-                    elif successive('up', 'right'):
+                    elif sequence('up', 'right'):
                         quickchat(quickchats[9], chatMode='party', spamCount=2)
                     
-                    # on up -> up, types 11th chat in quickchats list
-                    elif successive('up', 'up'):
+                    # on up -> up, types 11th chat in quickchats list (using team chat)
+                    elif sequence('up', 'up'):
                         quickchat(quickchats[10], chatMode='team')
                         break
 
-                    # on down -> left, types 12th chat in quickchats list
-                    elif successive('down', 'left'):
-                        quickchat(quickchats[11])
+                    # on down -> left, types "ok [foe]!!!"  ..... where [foe] is a random word from the 'foe' variations list above
+                    elif sequence('down', 'left'):
+                        quickchat('ok ' + variation('foe') + '!!!')    # <-- Another way to format word variations in your chats
+                        break
+
+                    # on RB + right, types "Wassup [friend]! Nice to see you again."
+                    elif combine('rb', 'right'):
+                        quickchat('Wassup %s! Nice to see you again.' % variation('friend'))    # <-- Yet another way to format word variations in your chats
+                        break
+
+                    # on down -> up, types a random cat fact (from the 'cat facts' variations list above)
+                    elif sequence('down', 'up'):
+                        quickchat(variation('cat facts'))
                         break
                     
     except Exception as e:
