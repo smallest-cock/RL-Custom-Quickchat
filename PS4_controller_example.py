@@ -242,7 +242,7 @@ while True:
                         quickchat('Wassup %s! Nice to see you again.' % variation('friend'))    # <-- Yet another way to format word variations in your chats
                         break
                     
-                    # on down -> up, types a random cat fact (from the 'cat facts' variations list above)
+                    # on down -> up, types a random cat fact (from the 'cat fact' variations list above)
                     elif sequence('down', 'up'):
                         quickchat(variation('cat fact'))
                         break
