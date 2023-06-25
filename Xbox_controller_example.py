@@ -22,14 +22,15 @@ quickchats = [
 # Create your own word variations and format them like this (see examples on how to use them in the "edit" section below)
 variations = {
     'friend': ['homie', 'blood', 'cuh', 'dawg', 'my guy', 'my man', 'nibba', 'my dude', 'comrade', 'playa', 'fellow gamer', 'brother', 'bro', 'bruh', 'buddy', 'bud', 'fellow human'],
-    'foe': ['clown', 'nerd', 'loser', 'bozo', 'small peen', 'tard', 'cringelord', 'idiot', 'bich', 'autist', 'dork', 'mouth breather', 'dumbass', 'virgin', 'fruitcake', 'weirdo', 'NPC'],
-    'compliment': ['noice', 'awesome', 'dank', 'fire', 'impressive', 'crispy', 'beautiful', 'sexy', 'clean', 'excellent', 'superb'],
-    'cat facts': ['Cats are believed to be the only mammals who don\'t taste sweetness.',   # <-- use " \' " in place of an apostrophe (to avoid the program crashing)
+    'foe': ['clown', 'nerd', 'loser', 'bozo', 'small peen', 'tard', 'cringelord', 'idiot', 'bitch', 'autist', 'dork', 'mouth breather', 'dumbass', 'virgin', 'fruitcake', 'weirdo', 'NPC'],
+    'compliment': ['noice', 'awesome', 'dank', 'fire', 'impressive', 'crispy', 'beautiful', 'sexy', 'clean', 'excellent', 'superb', 'lovely', 'delightful', 'splendid', 'bussin', 'bust-worthy'],
+    'cat fact': ['Cats are believed to be the only mammals who don\'t taste sweetness.',   # <-- always put a backslash ( " \ " ) before any apostrophe (to avoid the program crashing)
                   'Cats can jump up to six times their length.',
                   'Cats have 230 bones, while humans only have 206.',
                   "Cats' rough tongues can lick a bone clean of any shred of meat.",    # <-- or just wrap the chat in double quotes ( "..." ) if it contains an apostrophe
                   'Cats live longer when they stay indoors.',
-                  'Meowing is a behavior that cats developed exclusively to communicate with people.']
+                  'Meowing is a behavior that cats developed exclusively to communicate with people.'],
+    'taste': ['sweet', 'sour', 'bitter', 'salty', 'rich', 'spicy', 'savory']
 }
 
 # Time window given to read button sequence macros (1.1 seconds).... you can change this as you please
@@ -66,6 +67,7 @@ firstButtonPressed = {
     'time': 420
 }
 
+lastUsedVariations = {}
 macrosOn = True
 
 def resetFirstButtonPressed():
@@ -78,24 +80,22 @@ def combine(button1, button2):
         and (joysticks[0].get_button(buttons[button2]) or (joysticks[0].get_hat(0) == buttons[button2]))):
         resetFirstButtonPressed()
         return True
-    else:
-        return False
+    else: return False
 
-# Should detect sequence button/hat presses (buttons pressed in a specific order)
+# detects successive button presses (buttons pressed in a specific order)
 def sequence(button1, button2):
     global firstButtonPressed
     functionCallTime = time.time()
 
     if firstButtonPressed['button'] == None:
-        if (joysticks[0].get_button(buttons[button1]) or (joysticks[0].get_hat(0) == buttons[button1])):
+        if joysticks[0].get_button(buttons[button1]):
             firstButtonPressed['time'] = functionCallTime
             firstButtonPressed['button'] = button1
             return False
-        else:
-            return False
+        else: return False
     else:
         if functionCallTime > (firstButtonPressed['time'] + macroTimeWindow):
-            if (joysticks[0].get_button(buttons[button1]) or (joysticks[0].get_hat(0) == buttons[button1])):
+            if joysticks[0].get_button(buttons[button1]):
                 firstButtonPressed['time'] = functionCallTime
                 firstButtonPressed['button'] = button1
                 return False
@@ -103,15 +103,14 @@ def sequence(button1, button2):
                 resetFirstButtonPressed()
                 return False
         else:
-            if (joysticks[0].get_button(buttons[button2]) or (joysticks[0].get_hat(0) == buttons[button2])):
+            if joysticks[0].get_button(buttons[button2]):
                 if button1 == firstButtonPressed['button']:
                     if (functionCallTime > (firstButtonPressed['time'] + 0.05)):
                         resetFirstButtonPressed()
                         return True
-                else:
-                    return False   
-            else: 
-                return False
+                    else: return False
+                else: return False   
+            else: return False
 
 def quickchat(thing, chatMode='lobby', spamCount=1):
     for i in range(spamCount):
@@ -131,9 +130,33 @@ def toggleMacros(button):
             print('----- quickchat macros toggled off -----\n')
         time.sleep(.2)
 
+def resetLastUsedVariations(key=''):
+    if not (key == ''):
+        lastUsedVariations[key] = []
+    else:
+        for key in lastUsedVariations:
+            lastUsedVariations[key] = []
+
 def variation(key):
     global variations
-    return variations[key][randint(0, (len(variations[key]) - 1))]
+    global lastUsedVariations
+    if len(variations[key]) > 1:
+        while True:
+            randomVariation = variations[key][randint(0, (len(variations[key]) - 1))]
+            if not (randomVariation in lastUsedVariations[key]):
+                if len(lastUsedVariations[key]) < (len(variations[key]) - 1):
+                    lastUsedVariations[key].append(randomVariation)
+                    return randomVariation
+                else:
+                    resetLastUsedVariations(key)
+                    lastUsedVariations[key].append(randomVariation)
+                    return randomVariation                    
+    else:
+        print(f'The "{key}" variation list has less than 2 items..... it cannot be used properly!! Please add more items (words/phrases)')
+        return '-- "' + key + '" variation list needs more items --'
+
+lastUsedVariations = variations.copy()
+resetLastUsedVariations()
 
 pygame.init()
 pygame.joystick.init()
@@ -148,7 +171,9 @@ while True:
         for event in pygame.event.get():
             if (event.type == pygame.JOYBUTTONDOWN) or (event.type == pygame.JOYHATMOTION):
 
-    # ---------- Edit the code below to change macros, spam amounts, chat modes, or if you made changes to the length/order of the quickchats list above -----------------------
+
+# --------------------------- Edit the code below to change macros, spam amounts, chat modes, or if you made changes to the length/order of the quickchats list above -----------------------
+
 
                 toggleMacros('back') # <-- 'back' is the button used to toggle on/off quick chat macros (Xbox back button)..... change as you please
 
@@ -218,9 +243,9 @@ while True:
                         quickchat('Wassup %s! Nice to see you again.' % variation('friend'))    # <-- Yet another way to format word variations in your chats
                         break
 
-                    # on down -> up, types a random cat fact (from the 'cat facts' variations list above)
+                    # on down -> up, types a random cat fact (from the 'cat fact' variations list above)
                     elif sequence('down', 'up'):
-                        quickchat(variation('cat facts'))
+                        quickchat(variation('cat fact'))
                         break
                     
     except Exception as e:
