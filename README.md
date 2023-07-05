@@ -1,5 +1,5 @@
 # RL-Custom-Quickchat
-Enables custom quick chats in Rocket League (or really any game with chat) using controller macros
+Enables custom quick chats in Rocket League (or basically any game with chat) using controller macros
 
 ## Features
 - Custom quick chats
