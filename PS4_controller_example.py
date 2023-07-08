@@ -1,7 +1,7 @@
 import time
 import pyautogui
 import pygame
-from random import randint
+from random import sample
 
 
 
@@ -11,8 +11,8 @@ from random import randint
 
 # Create your own word variations and format them like this (see examples on how to use them in the "edit" section below)
 variations = {
-    'friend': ['homie', 'blood', 'cuh', 'dawg', 'my guy', 'my man', 'nibba', 'my dude', 'comrade', 'playa', 'fellow gamer', 'brother', 'bro', 'bruh', 'buddy', 'blud', 'fellow human', 'foo', 'homie'],
-    'foe': ['clown', 'nerd', 'loser', 'bozo', 'small peen', 'tard', 'cringelord', 'idiot', 'bitch', 'autist', 'dork', 'mouth breather', 'dumbass', 'virgin', 'fruitcake', 'weirdo', 'NPC'],
+    'friend': ['homie', 'blood', 'cuh', 'dawg', 'my guy', 'my man', 'nibba', 'my dude', 'comrade', 'playa', 'fellow gamer', 'brother', 'bro', 'bruh', 'buddy', 'blud', 'fellow human', 'foo', 'homie', 'broski', 'mate'],
+    'foe': ['clown', 'nerd', 'loser', 'bozo', 'small-peen', 'tard', 'cringelord', 'idiot', 'bitch', 'crayon eater', 'dork', 'mouth breather', 'dumbass', 'virgin', 'fruitcake', 'weirdo', 'NPC', 'dipshit'],
     'compliment': ['noice', 'awesome', 'dank', 'fire', 'impressive', 'crispy', 'beautiful', 'sexy', 'clean', 'excellent', 'superb', 'lovely', 'delightful', 'splendid', 'bussin', 'bust-worthy'],
     'cat fact': ['Cats are believed to be the only mammals who don\'t taste sweetness.',   # <-- always put a backslash ( " \ " ) before any apostrophe (to avoid the program crashing)
                   'Cats can jump up to six times their length.',
@@ -58,7 +58,6 @@ firstButtonPressed = {
     'time': 420
 }
 
-lastUsedVariations = {}
 macrosOn = True
 
 def resetFirstButtonPressed():
@@ -125,33 +124,43 @@ def toggleMacros(button):
                 print('----- quickchat macros toggled off -----\n')
             time.sleep(.2)
 
-def resetLastUsedVariations(key=''):
+def shuffleVariations(key=''):
     if not (key == ''):
-        lastUsedVariations[key] = []
+         lastWordUsed = shuffledVariations[key]['randomizedList'][len(variations[key]) - 1]
+         secondLastWordUsed = shuffledVariations[key]['randomizedList'][len(variations[key]) - 2]
+         while True:
+            shuffledList = sample(variations[key], len(variations[key]))
+            if not (shuffledList[0] == lastWordUsed) and (shuffledList[1] == secondLastWordUsed):
+                shuffledVariations[key]['randomizedList'] = shuffledList
+                shuffledVariations[key]['nextUsableIndex'] = 0
+                break
     else:
-        for key in lastUsedVariations:
-            lastUsedVariations[key] = []
+        for key in variations:
+            shuffledVariations[key] = {
+                'randomizedList': sample(variations[key], len(variations[key])),
+                'nextUsableIndex': 0
+            }
 
 def variation(key):
     global variations
-    global lastUsedVariations
-    if len(variations[key]) > 1:
-        while True:
-            randomVariation = variations[key][randint(0, (len(variations[key]) - 1))]
-            if not (randomVariation in lastUsedVariations[key]):
-                if len(lastUsedVariations[key]) < (len(variations[key]) - 1):
-                    lastUsedVariations[key].append(randomVariation)
-                    return randomVariation
-                else:
-                    resetLastUsedVariations(key)
-                    lastUsedVariations[key].append(randomVariation)
-                    return randomVariation                    
-    else:
-        print(f'The "{key}" variation list has less than 2 items..... it cannot be used properly!! Please add more items (words/phrases)')
+    global shuffledVariations
+    index = shuffledVariations[key]['nextUsableIndex']
+    if not len(variations[key]) > 2:
+        print(f'The "{key}" variation list has less than 3 items..... it cannot be used properly!! Please add more items (words/phrases)')
         return '-- "' + key + '" variation list needs more items --'
+    else:
+        if index < (len(variations[key])):
+            randWord = shuffledVariations[key]['randomizedList'][index]
+            shuffledVariations[key]['nextUsableIndex'] += 1
+            return randWord
+        else:
+            shuffleVariations(key)
+            randWord = shuffledVariations[key]['randomizedList'][0]
+            shuffledVariations[key]['nextUsableIndex'] += 1
+            return randWord
 
-lastUsedVariations = variations.copy()
-resetLastUsedVariations()
+shuffledVariations = variations.copy()
+shuffleVariations()
 pygame.init()
 pygame.joystick.init()
 joysticks = [pygame.joystick.Joystick(i) for i in range(pygame.joystick.get_count())]
