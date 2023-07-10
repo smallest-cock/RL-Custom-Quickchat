@@ -17,6 +17,7 @@ Enables custom quick chats in Rocket League (or any game with chat) using contro
  
 2. Open a Windows cmd (command prompt) and type `pip install pyautogui pygame`. This will install the required python packages for the script.
    - To open a command prompt: press the windows button, type "cmd", and hit enter
+   - If using kbm, replace `pygame` with `keyboard` in the above command... so it will be: `pip install pyautogui keyboard`
 4. [Download the code](https://github.com/smallest-cock/RL-Custom-Quickchat/archive/refs/heads/main.zip), extract the zip file, & put the `example.py` file somewhere (the one that applies to your controller)
    - Edit the .py file to change quick chats, macros, etc.
    - If you want to rename the .py file, do it before step 4
