@@ -66,43 +66,90 @@ def resetFirstButtonPressed():
 # Should detect simultaneous button/hat presses
 def combine(button1, button2):
     global numJoysticks
+    button1Tuple = type(button1) is tuple
+    button2Tuple = type(button2) is tuple
     for i in range(numJoysticks):
-        if ((joysticks[i].get_button(buttons[button1]) or (joysticks[i].get_hat(0) == buttons[button1]))
-            and (joysticks[i].get_button(buttons[button2]) or (joysticks[i].get_hat(0) == buttons[button2]))):
-            resetFirstButtonPressed()
-            return True
-        else: return False
+        if not button1Tuple:
+            if not button2Tuple:
+                if joysticks[i].get_button(buttons[button1]) and joysticks[i].get_button(buttons[button2]):
+                    resetFirstButtonPressed()
+                    return True
+                else: return False
+            else:
+                if joysticks[i].get_button(buttons[button1]) and (joysticks[i].get_hat(0) == buttons[button2]):
+                    resetFirstButtonPressed()
+                    return True
+                else: return False
+        else:
+            if not button2Tuple:
+                if (joysticks[i].get_hat(0) == buttons[button1]) and joysticks[i].get_button(buttons[button2]):
+                    resetFirstButtonPressed()
+                    return True
+                else: return False
+            else:
+                if (joysticks[i].get_hat(0) == buttons[button1]) and (joysticks[i].get_hat(0) == buttons[button2]):
+                    resetFirstButtonPressed()
+                    return True
+                else: return False
 
 # Should detect successive button presses (buttons pressed in a specific order)
 def sequence(button1, button2):
     global firstButtonPressed
     global numJoysticks
     functionCallTime = time.time()
+    button1Tuple = type(button1) is tuple
+    button2Tuple = type(button2) is tuple
     for i in range(numJoysticks):
         if firstButtonPressed['button'] == None:
-            if joysticks[i].get_button(buttons[button1]) or (joysticks[i].get_hat(0) == buttons[button1]):
-                firstButtonPressed['time'] = functionCallTime
-                firstButtonPressed['button'] = button1
-                return False
-            else: return False
-        else:
-            if functionCallTime > (firstButtonPressed['time'] + macroTimeWindow):
-                if joysticks[i].get_button(buttons[button1]) or (joysticks[i].get_hat(0) == buttons[button1]):
+            if not button1Tuple:
+                if joysticks[i].get_button(buttons[button1]):
                     firstButtonPressed['time'] = functionCallTime
                     firstButtonPressed['button'] = button1
                     return False
-                else:
-                    resetFirstButtonPressed()
-                    return False
-            else:
-                if joysticks[i].get_button(buttons[button2]) or (joysticks[i].get_hat(0) == buttons[button2]):
-                    if button1 == firstButtonPressed['button']:
-                        if (functionCallTime > (firstButtonPressed['time'] + 0.05)):
-                            resetFirstButtonPressed()
-                            return True
-                        else: return False
-                    else: return False   
                 else: return False
+            else:
+                if joysticks[i].get_hat(0) == buttons[button1]:
+                    firstButtonPressed['time'] = functionCallTime
+                    firstButtonPressed['button'] = button1
+                    return False
+                else: return False
+        else:
+            if functionCallTime > (firstButtonPressed['time'] + macroTimeWindow):
+                if not button1Tuple:
+                    if joysticks[i].get_button(buttons[button1]):
+                        firstButtonPressed['time'] = functionCallTime
+                        firstButtonPressed['button'] = button1
+                        return False
+                    else:
+                        resetFirstButtonPressed()
+                        return False
+                else:
+                    if joysticks[i].get_hat(0) == buttons[button1]:
+                        firstButtonPressed['time'] = functionCallTime
+                        firstButtonPressed['button'] = button1
+                        return False
+                    else:
+                        resetFirstButtonPressed()
+                        return False
+            else:
+                if not button2Tuple:
+                    if joysticks[i].get_button(buttons[button2]):
+                        if button1 == firstButtonPressed['button']:
+                            if (functionCallTime > (firstButtonPressed['time'] + 0.05)):
+                                resetFirstButtonPressed()
+                                return True
+                            else: return False
+                        else: return False   
+                    else: return False
+                else:
+                    if joysticks[i].get_hat(0) == buttons[button2]:
+                        if button1 == firstButtonPressed['button']:
+                            if (functionCallTime > (firstButtonPressed['time'] + 0.05)):
+                                resetFirstButtonPressed()
+                                return True
+                            else: return False
+                        else: return False
+                    else: return False
 
 def quickchat(thing, chatMode='lobby', spamCount=1):
     for i in range(spamCount):
