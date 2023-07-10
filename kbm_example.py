@@ -33,6 +33,8 @@ chatKeys = {
     'party': 'u'
 }
 
+macrosOn = True
+
 def press(button):
     return keyboard.is_pressed(button)
 
@@ -43,6 +45,16 @@ def quickchat(thing, chatMode='lobby', spamCount=1):
         pyautogui.press('enter')
         print(f'[{chatMode}]    {thing}\n')
         time.sleep(chatSpamInterval)
+
+def toggleMacros(button):
+    if keyboard.is_pressed(button):
+        global macrosOn
+        macrosOn = not macrosOn
+        if macrosOn:
+            print('----- quickchat macros toggled on -----\n')
+        else:
+            print('----- quickchat macros toggled off -----\n')
+        time.sleep(.2)
 
 def shuffleVariations(key=''):
     if not (key == ''):
@@ -92,36 +104,40 @@ while True:
 # ---------------------------------    Edit the code below to change quickchats, macros, spam amounts, chat modes, variations, etc.    --------------------------------------------------
 
 
-       
-        # When r + 4 is pressed, types "I pressed R and 4 at the same time."
-        if press('r+4'):
-            quickchat('I pressed R and 4 at the same time.')
-            continue
- 
-        # When ctrl is pressed, types "I just pressed the control button" (spamming 2 times)
-        elif press('ctrl'):
-            quickchat('I just pressed the control button', spamCount=2)
-            continue
-                    
-        # When shift + up is pressed, types "I just pressed shift + up" (in team chat)
-        elif press('shift+up'):
-            quickchat('I just pressed shift + up', chatMode='team')
-            continue
-           
-        # When down is pressed, types "that goal was [compliment]"  ......  where [compliment] is a random word from the 'compliment' variation list above
-        elif press('down'):
-            quickchat('that goal was ' + variation('compliment'))
-            continue
-        
-        # When up is pressed, types "[compliment] pass [friend]"
-        elif press('up'):
-            quickchat(variation('compliment') + ' pass ' + variation('friend'))
-            continue
 
-        # When delete is pressed, types a random cat fact from the 'cat fact' variation list above
-        elif press('delete'):
-            quickchat(variation('cat fact'))
-            continue
+        toggleMacros('home')
+
+        if macrosOn:
+
+            # When r + 4 is pressed, types "I pressed R and 4 at the same time."
+            if press('r+4'):
+                quickchat('I pressed R and 4 at the same time.')
+                continue
+    
+            # When ctrl is pressed, types "I just pressed the control button" (spamming 2 times)
+            elif press('ctrl'):
+                quickchat('I just pressed the control button', spamCount=2)
+                continue
+                        
+            # When shift + up is pressed, types "I just pressed shift + up" (in team chat)
+            elif press('shift+up'):
+                quickchat('I just pressed shift + up', chatMode='team')
+                continue
+            
+            # When down is pressed, types "that goal was [compliment]"  ......  where [compliment] is a random word from the 'compliment' variation list above
+            elif press('down'):
+                quickchat('that goal was ' + variation('compliment'))
+                continue
+            
+            # When up is pressed, types "[compliment] pass [friend]"
+            elif press('up'):
+                quickchat(variation('compliment') + ' pass ' + variation('friend'))
+                continue
+
+            # When delete is pressed, types a random cat fact from the 'cat fact' variation list above
+            elif press('delete'):
+                quickchat(variation('cat fact'))
+                continue
 
         
 
