@@ -80,14 +80,14 @@ def sequence(button1, button2):
     functionCallTime = time.time()
     for i in range(numJoysticks):
         if firstButtonPressed['button'] == None:
-            if joysticks[i].get_button(buttons[button1]):
+            if joysticks[i].get_button(buttons[button1]) or (joysticks[i].get_hat(0) == buttons[button1]):
                 firstButtonPressed['time'] = functionCallTime
                 firstButtonPressed['button'] = button1
                 return False
             else: return False
         else:
             if functionCallTime > (firstButtonPressed['time'] + macroTimeWindow):
-                if joysticks[i].get_button(buttons[button1]):
+                if joysticks[i].get_button(buttons[button1]) or (joysticks[i].get_hat(0) == buttons[button1]):
                     firstButtonPressed['time'] = functionCallTime
                     firstButtonPressed['button'] = button1
                     return False
@@ -95,7 +95,7 @@ def sequence(button1, button2):
                     resetFirstButtonPressed()
                     return False
             else:
-                if joysticks[i].get_button(buttons[button2]):
+                if joysticks[i].get_button(buttons[button2]) or (joysticks[i].get_hat(0) == buttons[button2]):
                     if button1 == firstButtonPressed['button']:
                         if (functionCallTime > (firstButtonPressed['time'] + 0.05)):
                             resetFirstButtonPressed()
