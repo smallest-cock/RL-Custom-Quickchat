@@ -10,9 +10,11 @@ Enables custom quick chats in Rocket League (or any game with chat) using button
 - Add word variations to spice up your chats
   - e.g. "thx [friend]"  ............  where [friend] can be "homie", "bro", "dude", "playa", "my guy", etc.
 - Toggle quick chat macros on/off with one press of a button
-  
 
-## How to use (for beginners):
+## Video tutorial
+https://youtu.be/G0Lperc-UU0
+
+## How to install (for beginners):
 1. Download & install [python](https://www.python.org/getit/). Make sure to check "Add Python 3.x to PATH" and click "Install Now"
  
 2. Open a Windows cmd (command prompt) and type `pip install pyautogui pygame`. This will install the required python packages for the script.
