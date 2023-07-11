@@ -66,28 +66,30 @@ def resetFirstButtonPressed():
 # Should detect simultaneous button/hat presses
 def combine(button1, button2):
     global numJoysticks
-    button1Tuple = type(buttons[button1]) is tuple
-    button2Tuple = type(buttons[button2]) is tuple
+    button1Value = buttons[button1]
+    button2Value = buttons[button2]
+    button1Tuple = type(button1Value) is tuple
+    button2Tuple = type(button2Value) is tuple
     for i in range(numJoysticks):
         if not button1Tuple:
             if not button2Tuple:
-                if joysticks[i].get_button(buttons[button1]) and joysticks[i].get_button(buttons[button2]):
+                if joysticks[i].get_button(button1Value) and joysticks[i].get_button(button2Value):
                     resetFirstButtonPressed()
                     return True
                 else: return False
             else:
-                if joysticks[i].get_button(buttons[button1]) and (joysticks[i].get_hat(0) == buttons[button2]):
+                if joysticks[i].get_button(button1Value) and (joysticks[i].get_hat(0) == button2Value):
                     resetFirstButtonPressed()
                     return True
                 else: return False
         else:
             if not button2Tuple:
-                if (joysticks[i].get_hat(0) == buttons[button1]) and joysticks[i].get_button(buttons[button2]):
+                if (joysticks[i].get_hat(0) == button1Value) and joysticks[i].get_button(button2Value):
                     resetFirstButtonPressed()
                     return True
                 else: return False
             else:
-                if (joysticks[i].get_hat(0) == buttons[button1]) and (joysticks[i].get_hat(0) == buttons[button2]):
+                if (joysticks[i].get_hat(0) == button1Value) and (joysticks[i].get_hat(0) == button2Value):
                     resetFirstButtonPressed()
                     return True
                 else: return False
@@ -283,6 +285,7 @@ while True:
                     elif sequence('down', 'up'):
                         quickchat(variation('cat fact'))
                         break
+                    
 
     
     except Exception as e:
