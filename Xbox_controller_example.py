@@ -66,8 +66,8 @@ def resetFirstButtonPressed():
 # Should detect simultaneous button/hat presses
 def combine(button1, button2):
     global numJoysticks
-    button1Tuple = type(button1) is tuple
-    button2Tuple = type(button2) is tuple
+    button1Tuple = type(buttons[button1]) is tuple
+    button2Tuple = type(buttons[button2]) is tuple
     for i in range(numJoysticks):
         if not button1Tuple:
             if not button2Tuple:
@@ -97,8 +97,8 @@ def sequence(button1, button2):
     global firstButtonPressed
     global numJoysticks
     functionCallTime = time.time()
-    button1Tuple = type(button1) is tuple
-    button2Tuple = type(button2) is tuple
+    button1Tuple = type(buttons[button1]) is tuple
+    button2Tuple = type(buttons[button2]) is tuple
     for i in range(numJoysticks):
         if firstButtonPressed['button'] == None:
             if not button1Tuple:
@@ -281,7 +281,9 @@ while True:
                     elif sequence('down', 'up'):
                         quickchat(variation('cat fact'))
                         break
-                    
+
+
+    
     except Exception as e:
         print(e)
         break
