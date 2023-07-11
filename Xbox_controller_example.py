@@ -97,18 +97,20 @@ def sequence(button1, button2):
     global firstButtonPressed
     global numJoysticks
     functionCallTime = time.time()
-    button1Tuple = type(buttons[button1]) is tuple
-    button2Tuple = type(buttons[button2]) is tuple
+    button1Value = buttons[button1]
+    button2Value = buttons[button2]
+    button1Tuple = type(button1Value) is tuple
+    button2Tuple = type(button2Value) is tuple
     for i in range(numJoysticks):
         if firstButtonPressed['button'] == None:
             if not button1Tuple:
-                if joysticks[i].get_button(buttons[button1]):
+                if joysticks[i].get_button(button1Value):
                     firstButtonPressed['time'] = functionCallTime
                     firstButtonPressed['button'] = button1
                     return False
                 else: return False
             else:
-                if joysticks[i].get_hat(0) == buttons[button1]:
+                if joysticks[i].get_hat(0) == button1Value:
                     firstButtonPressed['time'] = functionCallTime
                     firstButtonPressed['button'] = button1
                     return False
@@ -116,7 +118,7 @@ def sequence(button1, button2):
         else:
             if functionCallTime > (firstButtonPressed['time'] + macroTimeWindow):
                 if not button1Tuple:
-                    if joysticks[i].get_button(buttons[button1]):
+                    if joysticks[i].get_button(button1Value):
                         firstButtonPressed['time'] = functionCallTime
                         firstButtonPressed['button'] = button1
                         return False
@@ -124,7 +126,7 @@ def sequence(button1, button2):
                         resetFirstButtonPressed()
                         return False
                 else:
-                    if joysticks[i].get_hat(0) == buttons[button1]:
+                    if joysticks[i].get_hat(0) == button1Value:
                         firstButtonPressed['time'] = functionCallTime
                         firstButtonPressed['button'] = button1
                         return False
@@ -133,7 +135,7 @@ def sequence(button1, button2):
                         return False
             else:
                 if not button2Tuple:
-                    if joysticks[i].get_button(buttons[button2]):
+                    if joysticks[i].get_button(button2Value):
                         if button1 == firstButtonPressed['button']:
                             if (functionCallTime > (firstButtonPressed['time'] + 0.05)):
                                 resetFirstButtonPressed()
@@ -142,7 +144,7 @@ def sequence(button1, button2):
                         else: return False   
                     else: return False
                 else:
-                    if joysticks[i].get_hat(0) == buttons[button2]:
+                    if joysticks[i].get_hat(0) == button2Value:
                         if button1 == firstButtonPressed['button']:
                             if (functionCallTime > (firstButtonPressed['time'] + 0.05)):
                                 resetFirstButtonPressed()
@@ -281,7 +283,6 @@ while True:
                     elif sequence('down', 'up'):
                         quickchat(variation('cat fact'))
                         break
-
 
     
     except Exception as e:
