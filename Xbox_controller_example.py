@@ -5,6 +5,10 @@ from random import sample
 
 
 
+# -------------------------    Warning: this Xbox version of the script is entirely experimental and may not work at all... I don't yet have an Xbox controller to test on :(    ------------------------
+
+
+
 # -------------------------------------------    Go to the "edit" section below to edit quickchats, macros, etc.    -----------------------------------------------------------
 
 
