@@ -201,7 +201,6 @@ def shuffleVariations(key=''):
             }
 
 def variation(key):
-    global variations
     global shuffledVariations
     index = shuffledVariations[key]['nextUsableIndex']
     if not len(variations[key]) > 2:
