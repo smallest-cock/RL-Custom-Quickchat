@@ -5,7 +5,7 @@ from random import sample
 
 
 
-# -------------------------    Warning: this Xbox version of the script is entirely experimental and may not work at all... I don't yet have an Xbox controller to test on :(    ------------------------
+# -----------------------    Warning: this Xbox version of the script is entirely experimental and may not work properly... I don't yet have an Xbox controller to test on :(    ----------------------
 
 
 
@@ -40,7 +40,7 @@ chatKeys = {
     'party': 'u'
 }
 
-# Xbox controller button mappings for pygame.... these may wrong because I dont own an Xbox controller :(     (refer to https://www.pygame.org/docs/ref/joystick.html)
+# Xbox 360 controller button mappings for pygame.... these may be incorrect because I dont own an Xbox controller  (refer to https://www.pygame.org/docs/ref/joystick.html)
 buttons = {
     'a': 0,
     'b': 1,
@@ -62,69 +62,34 @@ firstButtonPressed = {
 }
 
 macrosOn = True
+buttonPressed = None
+buttonPressedIsHat = None
 
-def resetFirstButtonPressed():
-    firstButtonPressed['button'] = None     
-    firstButtonPressed['time'] = 420
-
-# Should detect simultaneous button/hat presses
+# Triggers on simultaneous button/hat presses
 def combine(button1, button2):
-    global numJoysticks
-    button1Value = buttons[button1]
-    button2Value = buttons[button2]
-    button1Tuple = type(button1Value) is tuple
-    button2Tuple = type(button2Value) is tuple
-    for i in range(numJoysticks):
-        if not button1Tuple:
-            if not button2Tuple:
-                if joysticks[i].get_button(button1Value) and joysticks[i].get_button(button2Value):
-                    resetFirstButtonPressed()
-                    return True
-                else: return False
-            else:
-                if joysticks[i].get_button(button1Value) and (joysticks[i].get_hat(0) == button2Value):
-                    resetFirstButtonPressed()
-                    return True
-                else: return False
-        else:
-            if not button2Tuple:
-                if (joysticks[i].get_hat(0) == button1Value) and joysticks[i].get_button(button2Value):
-                    resetFirstButtonPressed()
-                    return True
-                else: return False
-            else:
-                if (joysticks[i].get_hat(0) == button1Value) and (joysticks[i].get_hat(0) == button2Value):
-                    resetFirstButtonPressed()
-                    return True
-                else: return False
+    if type(buttonPressed) is list:
+        button1Value = buttons[button1]
+        button2Value = buttons[button2]
+        if (button1Value in buttonPressed) and (button2Value in buttonPressed):
+            return True
+        else: return False
+    else: return False
 
-# Should detect successive button presses (buttons pressed in a specific order)
+# Triggers on successive button/hat presses (buttons pressed in a specific order)
 def sequence(button1, button2):
-    global firstButtonPressed
-    global numJoysticks
-    functionCallTime = time.time()
-    button1Value = buttons[button1]
-    button2Value = buttons[button2]
-    button1Tuple = type(button1Value) is tuple
-    button2Tuple = type(button2Value) is tuple
-    for i in range(numJoysticks):
-        if firstButtonPressed['button'] == None:
-            if not button1Tuple:
-                if joysticks[i].get_button(button1Value):
+    if not type(buttonPressed) is list:
+        global firstButtonPressed
+        functionCallTime = time.time()
+        for i in range(numJoysticks):
+            if firstButtonPressed['button'] == None:
+                if buttonPressed == buttons[button1]:
                     firstButtonPressed['time'] = functionCallTime
                     firstButtonPressed['button'] = button1
                     return False
                 else: return False
             else:
-                if joysticks[i].get_hat(0) == button1Value:
-                    firstButtonPressed['time'] = functionCallTime
-                    firstButtonPressed['button'] = button1
-                    return False
-                else: return False
-        else:
-            if functionCallTime > (firstButtonPressed['time'] + macroTimeWindow):
-                if not button1Tuple:
-                    if joysticks[i].get_button(button1Value):
+                if functionCallTime > (firstButtonPressed['time'] + macroTimeWindow):
+                    if buttonPressed == buttons[button1]:
                         firstButtonPressed['time'] = functionCallTime
                         firstButtonPressed['button'] = button1
                         return False
@@ -132,16 +97,7 @@ def sequence(button1, button2):
                         resetFirstButtonPressed()
                         return False
                 else:
-                    if joysticks[i].get_hat(0) == button1Value:
-                        firstButtonPressed['time'] = functionCallTime
-                        firstButtonPressed['button'] = button1
-                        return False
-                    else:
-                        resetFirstButtonPressed()
-                        return False
-            else:
-                if not button2Tuple:
-                    if joysticks[i].get_button(button2Value):
+                    if buttonPressed == buttons[button2]:
                         if button1 == firstButtonPressed['button']:
                             if (functionCallTime > (firstButtonPressed['time'] + 0.05)):
                                 resetFirstButtonPressed()
@@ -149,15 +105,65 @@ def sequence(button1, button2):
                             else: return False
                         else: return False   
                     else: return False
+    else: return False
+
+# Reads button presses
+def detectButtonPressed():
+    for i in range(numJoysticks):
+        for key in buttons:
+            buttonVal = buttons[key]
+            if controllerHasHats:
+                if buttonPressedIsHat:
+                    if type(buttonVal) is tuple:
+                        if joysticks[i].get_hat(0) == buttonVal:
+                            for otherKey in buttons:
+                                if not (otherKey == key):
+                                    otherButtonVal = buttons[otherKey]
+                                    if type(otherButtonVal) is tuple:
+                                        if joysticks[i].get_hat(0) == otherButtonVal:
+                                            return [buttonVal, otherButtonVal]
+                                    else:
+                                        if joysticks[i].get_button(otherButtonVal):
+                                            return [buttonVal, otherButtonVal]
+                            return buttonVal
+                        else: continue
+                    else: continue
                 else:
-                    if joysticks[i].get_hat(0) == button2Value:
-                        if button1 == firstButtonPressed['button']:
-                            if (functionCallTime > (firstButtonPressed['time'] + 0.05)):
-                                resetFirstButtonPressed()
-                                return True
-                            else: return False
-                        else: return False
-                    else: return False
+                    if type(buttonVal) is int:
+                        if joysticks[i].get_button(buttonVal):
+                            for otherKey in buttons:
+                                if not (otherKey == key):
+                                    otherButtonVal = buttons[otherKey]
+                                    if type(otherButtonVal) is tuple:
+                                        if joysticks[i].get_hat(0) == otherButtonVal:
+                                            return [buttonVal, otherButtonVal]
+                                    else:
+                                        if joysticks[i].get_button(otherButtonVal):
+                                            return [buttonVal, otherButtonVal]
+                            return buttonVal
+                        else: continue
+                    else: continue
+            else:
+                if not type(buttonVal) is tuple:
+                    if joysticks[i].get_button(buttonVal):
+                        for otherKey in buttons:
+                            if not (otherKey == key):
+                                otherButtonVal = buttons[otherKey]
+                                if not type(otherButtonVal) is tuple:
+                                    if joysticks[i].get_button(otherButtonVal):
+                                        return [buttonVal, otherButtonVal]                                    
+                        return buttonVal
+    return None 
+
+def resetFirstButtonPressed():
+    firstButtonPressed['button'] = None     
+    firstButtonPressed['time'] = 420
+
+def checkIfPressedButtonIsHat(event):
+    if event.type == pygame.JOYBUTTONDOWN:
+        return False
+    elif event.type == pygame.JOYHATMOTION:
+        return True
 
 def quickchat(thing, chatMode='lobby', spamCount=1):
     for i in range(spamCount):
@@ -168,10 +174,10 @@ def quickchat(thing, chatMode='lobby', spamCount=1):
         time.sleep(chatSpamInterval)
 
 def toggleMacros(button):
-    global numJoysticks
-    for i in range(numJoysticks):
-        if (joysticks[i].get_button(buttons[button]) or (joysticks[i].get_hat(0) == buttons[button])):
-            global macrosOn
+    global macrosOn
+    if not type(buttonPressed) is list:
+        buttonValue = buttons[button]
+        if buttonValue == buttonPressed:
             macrosOn = not macrosOn
             if macrosOn:
                 print('----- quickchat macros toggled on -----\n')
@@ -219,8 +225,11 @@ shuffleVariations()
 pygame.init()
 pygame.joystick.init()
 joysticks = [pygame.joystick.Joystick(i) for i in range(pygame.joystick.get_count())]
+controllerHasHats = False
 
 for controller in joysticks:
+    if controller.get_numhats() > 0:
+        controllerHasHats = True
     if controller.get_init() == True:
         print(f"\n\n~~~~~~ {controller.get_name()} detected ~~~~~~\n\nwaiting for quickchat inputs....\n\n")
 
@@ -228,7 +237,9 @@ while True:
     try:
         for event in pygame.event.get():
             if (event.type == pygame.JOYBUTTONDOWN) or (event.type == pygame.JOYHATMOTION):
+                buttonPressedIsHat = checkIfPressedButtonIsHat(event)
                 numJoysticks = pygame.joystick.get_count()
+                buttonPressed = detectButtonPressed()
 
 
 
@@ -236,33 +247,28 @@ while True:
 
 
 
-                toggleMacros('back') # <-- 'back' is the button used to toggle on/off quick chat macros (Xbox back button)..... change as you please
+                toggleMacros('y') # <-- 'y' is the button used to toggle on/off quick chat macros (Xbox Y button)..... change as you please
 
                 if macrosOn:
-
-                    # on X + up, types "noice"
-                    if combine('x', 'up'):
-                        quickchat('noice')
-                        break
                     
+                    # on X + A, types "let me cook"
+                    if combine('x', 'a'):
+                        quickchat('let me cook')
+                        break
+                
                     # on X + left, types "dont lose this kickoff" (spamming 2 times)
                     elif combine('x', 'left'):
                         quickchat('dont lose this kickoff', spamCount=2)  # <-- the '2' parameter is how many times the chat will be spammed.. the max you can put is 3 (before RL gives a chat timeout)
                         break
                     
-                    # on B + up, types "tell me how you really feel..." (using team chat)
-                    elif combine('B', 'up'):
+                    # on B + X, types "tell me how you really feel..." (using team chat)
+                    elif combine('b', 'x'):
                         quickchat('tell me how you really feel...', chatMode='team')
                         break
                     
-                    # on A + right, types "im lagging" (using team chat, spamming 3 times)
-                    elif combine('a', 'right'):
+                    # on A -> A, types "im lagging" (using team chat, spamming 3 times)
+                    elif sequence('a', 'a'):
                         quickchat('im lagging', chatMode='team', spamCount=3)
-                        break
-
-                    # on up -> right, types "let me cook"
-                    elif sequence('up', 'right'):
-                        quickchat('let me cook')
                         break
                     
                     # on up -> left, types "im gay" (using party chat)
@@ -291,7 +297,7 @@ while True:
                         break
                     
 
-    
+
     except Exception as e:
         print(e)
         break
