@@ -63,8 +63,6 @@ firstButtonPressed = {
 }
 
 macrosOn = True
-buttonPressed = None
-buttonPressedIsHat = None
 
 # Triggers on simultaneous button/hat presses
 def combine(button1, button2):
@@ -161,10 +159,9 @@ def resetFirstButtonPressed():
     firstButtonPressed['time'] = 420
 
 def checkIfPressedButtonIsHat(event):
-    if event.type == pygame.JOYBUTTONDOWN:
-        return False
-    elif event.type == pygame.JOYHATMOTION:
+    if event.type == pygame.JOYHATMOTION:
         return True
+    else: return False
 
 def quickchat(thing, chatMode='lobby', spamCount=1):
     for i in range(spamCount):
