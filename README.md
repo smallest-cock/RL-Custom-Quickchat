@@ -22,11 +22,11 @@ https://youtu.be/G0Lperc-UU0
    - To open a command prompt: press the windows button -> type "cmd" -> hit enter
 4. [Download the code](https://github.com/smallest-cock/RL-Custom-Quickchat/archive/refs/heads/main.zip), extract the zip file, & put the `example.py` file somewhere (the one that applies to you)
    - If you want to rename the .py file, do it before step 4
-   - Edit the .py file to change quick chats, macros, etc.
 7. Right-click the .py file -> Create shortcut
 8. Right-click the shortcut -> Properties -> Target: -> add the word "python" to the beginning, so it looks like: `python "C:\Users\....."`. Click Apply.
     - You can also change Run: -> Minimized to have it start minimized
 9. Leave the script running any time you want to use custom quick chats :)
+   - Edit the .py file to change quick chats, macros, etc.
 
 ## Support
 [Buy me a coffee ☕](https://cash.app/$naptime559) <3
