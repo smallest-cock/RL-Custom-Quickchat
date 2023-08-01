@@ -27,6 +27,11 @@ variations = {
     'taste': ['sweet', 'sour', 'bitter', 'salty', 'rich', 'spicy', 'savory']
 }
 
+# Adjusts chat typing speed (seconds per character) ...
+typingDelay = .002          # 0 makes chats type out instantly (but will cut off long chats)
+                            # .001 will allow long chats (but occasionally goes too fast for RL, causing typos)
+                            # .002 seems to be slow enough for the RL chat box to reliably keep up (no typos)
+
 # Time window given to read button sequence macros (1.1 seconds).... you can change this as you please
 macroTimeWindow = 1.1
 
@@ -166,7 +171,7 @@ def checkIfPressedButtonIsHat(event):
 def quickchat(thing, chatMode='lobby', spamCount=1):
     for i in range(spamCount):
         pyautogui.press(chatKeys[chatMode])
-        pyautogui.write(thing, interval=0.002)  # <-- the "interval" parameter is required if your chat is longer than one line... you can remove this if your chat isnt long, to make it type out instantly
+        pyautogui.write(thing, interval=typingDelay)  # <-- the "interval" parameter is required if your chat is longer than one line... you can remove this if your chat isnt long, to make it type out instantly
         pyautogui.press('enter')
         print(f'[{chatMode}]    {thing}\n')
         time.sleep(chatSpamInterval)
