@@ -166,7 +166,7 @@ def checkIfPressedButtonIsHat(event):
 def quickchat(thing, chatMode='lobby', spamCount=1):
     for i in range(spamCount):
         pyautogui.press(chatKeys[chatMode])
-        pyautogui.write(thing, interval=0.001)  # <-- the "interval" parameter is required if your chat is longer than one line... you can remove this if your chat isnt long, to make it type out instantly
+        pyautogui.write(thing, interval=0.002)  # <-- the "interval" parameter is required if your chat is longer than one line... you can remove this if your chat isnt long, to make it type out instantly
         pyautogui.press('enter')
         print(f'[{chatMode}]    {thing}\n')
         time.sleep(chatSpamInterval)
