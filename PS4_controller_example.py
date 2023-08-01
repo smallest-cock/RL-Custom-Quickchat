@@ -66,7 +66,6 @@ def resetFirstButtonPressed():
 
 # detects simultaneous button presses
 def combine(button1, button2):
-    global numJoysticks
     for i in range(numJoysticks):
         if joysticks[i].get_button(buttons[button1]) and joysticks[i].get_button(buttons[button2]):
             resetFirstButtonPressed()
@@ -76,7 +75,6 @@ def combine(button1, button2):
 # detects successive button presses (buttons pressed in a specific order)
 def sequence(button1, button2):
     global firstButtonPressed
-    global numJoysticks
     functionCallTime = time.time()
     for i in range(numJoysticks):
         if firstButtonPressed['button'] == None:
@@ -113,7 +111,6 @@ def quickchat(thing, chatMode='lobby', spamCount=1):
         time.sleep(chatSpamInterval)
 
 def toggleMacros(button):
-    global numJoysticks
     for i in range(numJoysticks):
         if joysticks[i].get_button(buttons[button]):
             global macrosOn
@@ -142,7 +139,6 @@ def shuffleVariations(key=''):
             }
 
 def variation(key):
-    global variations
     global shuffledVariations
     index = shuffledVariations[key]['nextUsableIndex']
     if not len(variations[key]) > 2:
