@@ -179,12 +179,12 @@ while True:
                 continue
 
             # on ctrl + up, starts listening for speech-to-text (lobby chat)
-            elif press('ctrl+up'):
+            elif press('end'):
                 quickchat(speechToText(mic))
                 break
               
             # on ctrl + left, starts listening for speech-to-text (team chat)
-            elif press('ctrl+left'): 
+            elif press('pagedown'): 
                 quickchat(speechToText(mic), chatMode='team')
                 break
         
