@@ -2,7 +2,7 @@ import time
 import pyautogui
 import keyboard
 from random import sample
-
+import speech_recognition as sr
 
 
 # -------------------------------------------    Go to the "edit" section below to edit quickchats, macros, etc.    -----------------------------------------------------------
@@ -95,11 +95,45 @@ def variation(key):
             randWord = shuffledVariations[key]['randomizedList'][0]
             shuffledVariations[key]['nextUsableIndex'] += 1
             return randWord
+
+def speechToText(microphone):
+    with microphone as source:
+        # r.adjust_for_ambient_noise(source)
+        print('speak now...\n')
+        audio = r.listen(source, timeout=5)
+    startInterpretationTime = time.time()
+    # set up the response object
+    response = {
+        "success": True,
+        "error": None,
+        "transcription": 'my speech recognition failed :(',
+        "interpretation time": None
+    }
+    try:
+        response["transcription"] = r.recognize_google(audio)
+        response["interpretation time"] = time.time() - startInterpretationTime
+        print(f'({round(response["interpretation time"], 2)}s interpretation)\n')
+    except sr.RequestError:
+        # API was unreachable or unresponsive
+        response["success"] = False
+        response["error"] = "API unavailable"
+        print(response)
+    except sr.UnknownValueError:
+        # speech was unintelligible
+        response["error"] = "Unable to recognize speech"
+        print(response)
+    return response['transcription'].lower()
         
 shuffledVariations = variations.copy()
 shuffleVariations()
 
 print(f"\n\n~~~~~~~~~~~~~~ KBM version ~~~~~~~~~~~~~~\n\nwaiting for quickchat inputs....\n\n")
+
+# speech recognition init
+r = sr.Recognizer()
+mic = sr.Microphone()
+with mic as source:
+    r.adjust_for_ambient_noise(source) # <--- adjusts mic sensitvity for background noise based on a 1s sample of mic audio
 
 while True:
     try:
@@ -144,6 +178,15 @@ while True:
                 quickchat(variation('cat fact'))
                 continue
 
+            # on ctrl + up, starts listening for speech-to-text (lobby chat)
+            elif combine('ctrl+up'):
+                quickchat(speechToText(mic))
+                break
+              
+            # on ctrl + left, starts listening for speech-to-text (team chat)
+            elif combine('ctrl+left'): 
+                quickchat(speechToText(mic), chatMode='team')
+                break
         
 
     except Exception as e:
