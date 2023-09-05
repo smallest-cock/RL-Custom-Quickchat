@@ -13,7 +13,7 @@ Enables custom quick chats in Rocket League (or any game with chat) using button
 - Specify chat mode (lobby/team/party)
 - Add word variations to spice up your chats
   - e.g. "thx [friend]"  ............  where [friend] is a random word from a list containing "homie", "bro", "blud", "my guy", "foo" etc.
-  - Customize the words used for variations
+  - Customize the word lists used for variations
 - Toggle all macros on/off with one press of a button
 
 ## How to install (for beginners):
