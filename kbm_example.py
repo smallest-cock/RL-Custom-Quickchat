@@ -140,15 +140,17 @@ while True:
 
 
 
-# ---------------------------------    Edit the code below to change quickchats, macros, spam amounts, chat modes, variations, etc.    --------------------------------------------------
+# -------------------------------------    Edit the code below to change quickchats, macros, spam amounts, chat modes, variations, etc.    --------------------------------------------------
 
 
+      # ------------    Testing these macros via the terminal may cause the script to exit prematurely (due to auto typing), but it wont happen if another app is in focus    ---------------
+       
 
         toggleMacros('home')
 
         if macrosOn:
 
-            # When r + 4 is pressed, types "I pressed R and 4 at the same time."
+            # When R + 4 is pressed, types "I pressed R and 4 at the same time."
             if press('r+4'):
                 quickchat('I pressed R and 4 at the same time.')
                 continue
@@ -158,7 +160,7 @@ while True:
                 quickchat('I just pressed the control button', spamCount=2)
                 continue
                         
-            # When shift + up is pressed, types "I just pressed shift + up" (in team chat)
+            # When Shift + up is pressed, types "I just pressed shift + up" (in team chat)
             elif press('shift+up'):
                 quickchat('I just pressed shift + up', chatMode='team')
                 continue
@@ -173,17 +175,17 @@ while True:
                 quickchat(variation('compliment') + ' pass ' + variation('friend'))
                 continue
 
-            # When delete is pressed, types a random cat fact from the 'cat fact' variation list above
+            # When Delete is pressed, types a random cat fact from the 'cat fact' variation list above
             elif press('delete'):
                 quickchat(variation('cat fact'))
                 continue
 
-            # on ctrl + up, starts listening for speech-to-text (lobby chat)
+            # When End is pressed, starts listening for speech-to-text (lobby chat)
             elif press('end'):
                 quickchat(speechToText(mic))
                 break
               
-            # on ctrl + left, starts listening for speech-to-text (team chat)
+            # When PgDn is pressed, starts listening for speech-to-text (team chat)
             elif press('pagedown'): 
                 quickchat(speechToText(mic), chatMode='team')
                 break
