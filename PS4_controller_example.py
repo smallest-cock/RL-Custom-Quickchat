@@ -108,12 +108,18 @@ def sequence(button1, button2):
                 else: return False
 
 def quickchat(thing, chatMode='lobby', spamCount=1):
-    for i in range(spamCount):
-        pyautogui.press(chatKeys[chatMode])
-        pyautogui.write(thing, interval=typingDelay)
-        pyautogui.press('enter')
-        print(f'[{chatMode}]    {thing}\n')
-        time.sleep(chatSpamInterval)
+    if not thing: 
+        print('quickchat failed.. (there was nothing to quickchat)\n')
+        return
+    try:
+        for i in range(spamCount):
+            pyautogui.press(chatKeys[chatMode])
+            pyautogui.write(thing, interval=typingDelay)
+            pyautogui.press('enter')
+            print(f'[{chatMode}]    {thing}\n')
+            time.sleep(chatSpamInterval)
+    except Exception as e:
+        print(e)
 
 def toggleMacros(button):
     for i in range(numJoysticks):
@@ -161,10 +167,13 @@ def variation(key):
             return randWord
 
 def speechToText(microphone):
-    with microphone as source:
-        # r.adjust_for_ambient_noise(source)
-        print('speak now...\n')
-        audio = r.listen(source, timeout=5)
+    try:
+        with microphone as source:
+            print('speak now...\n')
+            audio = r.listen(source, timeout=5)
+    except sr.WaitTimeoutError:
+        print(' -- Listening timed out while waiting for phrase to start -- (you didnt speak within 5s, or your mic is muted)')
+        return None
 
     startInterpretationTime = time.time()
     # set up the response object
@@ -188,6 +197,9 @@ def speechToText(microphone):
         # speech was unintelligible
         response["error"] = "Unable to recognize speech"
         print(response)
+    except Exception as e:
+        print(e)
+        return
 
     return response['transcription'].lower()
 
