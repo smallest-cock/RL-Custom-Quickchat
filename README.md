@@ -30,5 +30,12 @@ Enables custom quick chats in Rocket League (or any game with chat) using button
 6. Leave the script running any time you want to use custom quick chats :)
    - Edit the .py file to change quick chats, macros, etc.
 
+## Troubleshooting / Errors:
+If the script isn't detecting your button presses properly, you may need to edit the `buttons` dictionary in your script:
+
+![buttonslist](https://github.com/smallest-cock/RL-Custom-Quickchat/assets/48503773/9ccc127d-c148-463a-8992-cbc14e33e19a)
+
+In order to find out which values to use for each button, run `button_input_tester.py` and press each button you want to test. It will give you the correct values.
+
 ### Support
 [Buy me a coffee ☕](https://cash.app/$naptime559) <3
