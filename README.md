@@ -35,7 +35,7 @@ If the script isn't detecting your button presses properly, you may need to edit
 
 ![buttonslist](https://github.com/smallest-cock/RL-Custom-Quickchat/assets/48503773/9ccc127d-c148-463a-8992-cbc14e33e19a)
 
-In order to find out which values to use for each button, run `button_input_tester.py` and press each button you want to test. It will give you the correct values.
+In order to find out which values to use for each button, run `button_value_tester.py` and press each button you want to test. It will give you the correct values.
 
 ### Support
 [Buy me a coffee ☕](https://cash.app/$naptime559) <3
