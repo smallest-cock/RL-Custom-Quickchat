@@ -7,7 +7,7 @@ Enables custom quick chats in Rocket League (or any game with chat) using button
 ## Features
 - Custom quick chats
 - Speech-to-text chats
-  - [Video tutorial](https://youtu.be/cqEdJQ-X7X4?si=_mhjDqfeAHE3WAsk)   
+  - [Video demonstration](https://youtu.be/cqEdJQ-X7X4?si=_mhjDqfeAHE3WAsk)   
 - Create button combination macros (e.g. Circle + Up) or button sequence macros (e.g. Left -> Up) for controller
 - Choose how many times to spam a chat
   - Customize spam interval (in seconds)
