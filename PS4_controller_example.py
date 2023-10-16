@@ -1,4 +1,5 @@
 import time
+import os
 import pyautogui
 import pygame
 from random import sample
@@ -22,6 +23,12 @@ variations = {
                   'Meowing is a behavior that cats developed exclusively to communicate with people.'],
     'taste': ['sweet', 'sour', 'bitter', 'salty', 'rich', 'spicy', 'savory']
 }
+
+# PNG images for autoclicker
+disableSafeModeButtonImage = 'dsm.png'
+cosmeticsTabImage = 'cosmetics_tab.png'
+ballTextureDropdownImage = 'ball_texture_dropdown.png'
+ballSelectionImage = 'ball_selection.png'
 
 # Adjusts chat typing speed (seconds per character) ...
 typingDelay = .002          # 0 makes chats type out instantly (but will cut off long chats)
@@ -203,6 +210,46 @@ def speechToText(microphone):
 
     return response['transcription'].lower()
 
+# Auto click things in AlphaConsole menu to enable ball texture
+def enableBallTexture():
+    time.sleep(1)
+    pyautogui.move(50, 50)
+    try:
+        # find and click disable safemode button
+        disableSafeModeButtonCoords = pyautogui.locateCenterOnScreen(disableSafeModeButtonImage, confidence=0.9, grayscale=True)
+        pyautogui.moveTo(disableSafeModeButtonCoords[0], disableSafeModeButtonCoords[1])
+        pyautogui.mouseDown()
+        time.sleep(.1)
+        pyautogui.mouseUp()
+        time.sleep(.3)
+
+        # find and click cosmetics tab
+        cosmeticsTabCoords = pyautogui.locateCenterOnScreen(cosmeticsTabImage, confidence=0.8, grayscale=True)
+        pyautogui.moveTo(cosmeticsTabCoords[0], cosmeticsTabCoords[1])
+        pyautogui.mouseDown()
+        time.sleep(.1)
+        pyautogui.mouseUp()
+
+        # find and click ball texture dropdown
+        dropdownCoords = pyautogui.locateCenterOnScreen(ballTextureDropdownImage, confidence=0.9, grayscale=True)
+        pyautogui.moveTo(dropdownCoords[0], dropdownCoords[1])
+        pyautogui.mouseDown()
+        time.sleep(.1)
+        pyautogui.mouseUp()
+
+        # find and click ball texture
+        ballSelectionCoords = pyautogui.locateCenterOnScreen(ballSelectionImage, confidence=0.99, grayscale=False)
+        pyautogui.moveTo(ballSelectionCoords[0], ballSelectionCoords[1])
+        pyautogui.mouseDown()
+        time.sleep(.1)
+        pyautogui.mouseUp()
+
+    except Exception as e:
+        print(e)
+
+# change working directory to script directory (so .png files are easily located)
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
+
 shuffledVariations = variations.copy()
 shuffleVariations()
 pygame.init()
@@ -293,6 +340,11 @@ while True:
                     # on x + left, starts listening for speech-to-text (team chat)
                     elif combine('x', 'left'): 
                         quickchat(speechToText(mic), chatMode='team')
+                        break
+                    
+                    # enable custom ball texture in a match
+                    elif combine('triangle', 'left'):
+                        enableBallTexture()
                         break
 
     
