@@ -227,22 +227,29 @@ def enableBallTexture():
         cosmeticsTabCoords = pyautogui.locateCenterOnScreen(cosmeticsTabImage, confidence=0.8, grayscale=True)
         pyautogui.moveTo(cosmeticsTabCoords[0], cosmeticsTabCoords[1])
         pyautogui.mouseDown()
-        time.sleep(.1)
+        time.sleep(.05)
         pyautogui.mouseUp()
 
         # find and click ball texture dropdown
         dropdownCoords = pyautogui.locateCenterOnScreen(ballTextureDropdownImage, confidence=0.9, grayscale=True)
         pyautogui.moveTo(dropdownCoords[0], dropdownCoords[1])
         pyautogui.mouseDown()
-        time.sleep(.1)
+        time.sleep(.05)
         pyautogui.mouseUp()
 
         # find and click ball texture
         ballSelectionCoords = pyautogui.locateCenterOnScreen(ballSelectionImage, confidence=0.99, grayscale=False)
         pyautogui.moveTo(ballSelectionCoords[0], ballSelectionCoords[1])
         pyautogui.mouseDown()
-        time.sleep(.1)
+        time.sleep(.05)
         pyautogui.mouseUp()
+
+        # click outside of menu window (to bring alphaconsole out of focus), then press F5 to exit menu
+        pyautogui.moveTo(25, 25)
+        pyautogui.mouseDown()
+        time.sleep(.05)
+        pyautogui.mouseUp()
+        pyautogui.press('f5')
 
     except Exception as e:
         print(e)
