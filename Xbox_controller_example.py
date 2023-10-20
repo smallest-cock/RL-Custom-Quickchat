@@ -270,33 +270,36 @@ def speechToText(microphone):
 
 # Auto click things in AlphaConsole menu to enable ball texture
 def enableBallTexture():
-    time.sleep(1)
+    time.sleep(.5)
     pyautogui.move(50, 50)
     try:
-        # find and click disable safemode button
+        # find and click 'disable safe mode' button
         disableSafeModeButtonCoords = pyautogui.locateCenterOnScreen(disableSafeModeButtonImage, confidence=0.9, grayscale=True)
         pyautogui.moveTo(disableSafeModeButtonCoords[0], disableSafeModeButtonCoords[1])
         pyautogui.mouseDown()
         time.sleep(.1)
         pyautogui.mouseUp()
-        time.sleep(.3)
+        time.sleep(.2)
 
         # find and click cosmetics tab
-        cosmeticsTabCoords = pyautogui.locateCenterOnScreen(cosmeticsTabImage, confidence=0.8, grayscale=True)
+        # starts searching 175px above 'disable safe mode' button, looking in a 200px region beneath
+        cosmeticsTabCoords = pyautogui.locateCenterOnScreen(cosmeticsTabImage, confidence=0.8, grayscale=True, region=(0, disableSafeModeButtonCoords[1] - 175, 1920, 200))
         pyautogui.moveTo(cosmeticsTabCoords[0], cosmeticsTabCoords[1])
         pyautogui.mouseDown()
         time.sleep(.05)
         pyautogui.mouseUp()
 
         # find and click ball texture dropdown
-        dropdownCoords = pyautogui.locateCenterOnScreen(ballTextureDropdownImage, confidence=0.9, grayscale=True)
+        # starts searching 100px below cosmetics tab, looking in a 500px region beneath
+        dropdownCoords = pyautogui.locateCenterOnScreen(ballTextureDropdownImage, confidence=0.9, grayscale=True, region=(0, cosmeticsTabCoords[1] + 100, 1920, 500))
         pyautogui.moveTo(dropdownCoords[0], dropdownCoords[1])
         pyautogui.mouseDown()
         time.sleep(.05)
         pyautogui.mouseUp()
 
-        # find and click ball texture
-        ballSelectionCoords = pyautogui.locateCenterOnScreen(ballSelectionImage, confidence=0.99, grayscale=False)
+        # find and click ball texture 
+        # starts searching 15px below dropdown menu (to avoid false positive in dropdown menu), looking in a 300px region beneath
+        ballSelectionCoords = pyautogui.locateCenterOnScreen(ballSelectionImage, confidence=0.9, grayscale=True, region=(0, dropdownCoords[1] + 15, 1920, 300))
         pyautogui.moveTo(ballSelectionCoords[0], ballSelectionCoords[1])
         pyautogui.mouseDown()
         time.sleep(.05)
