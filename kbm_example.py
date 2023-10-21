@@ -31,6 +31,8 @@ ballTextureDropdownImage = 'ball_texture_dropdown.png'
 ballSelectionImage = 'ball_selection.png'
 xButton = 'x.png'
 
+autoclickAttemptsPerImage = 3
+
 # Adjusts chat typing speed (seconds per character) ...
 typingDelay = .002          # 0 makes chats type out instantly (but will cut off long chats)
                             # .001 will allow long chats (but occasionally goes too fast for RL, causing typos)
@@ -145,49 +147,48 @@ def speechToText(microphone):
         return  
     return response['transcription'].lower()
 
+def clickThing(image, confidence=0.9, grayscale=True, region=None):
+    for i in range(autoclickAttemptsPerImage):
+        try:
+            imageCoords = pyautogui.locateCenterOnScreen(image, confidence=confidence, grayscale=grayscale) \
+                if region == None else pyautogui.locateCenterOnScreen(image, confidence=confidence, grayscale=grayscale, region=region)
+            pyautogui.moveTo(imageCoords[0], imageCoords[1])
+            pyautogui.mouseDown()
+            time.sleep(.05)
+            pyautogui.mouseUp()
+            return imageCoords
+        except Exception as e:
+            if (i < autoclickAttemptsPerImage - 1):
+                print(f'\ncouldn\'t find {image} on screen ... trying again')
+            else:
+                print("\nError: ", e)
+                print(f'couldn\'t locate {image} on screen :(')
+            continue
+
 # Auto click things in AlphaConsole menu to enable ball texture
 def enableBallTexture():
-    time.sleep(.6)
+    time.sleep(.3)
     pyautogui.move(50, 50)
     try:
         # find and click 'disable safe mode' button
-        disableSafeModeButtonCoords = pyautogui.locateCenterOnScreen(disableSafeModeButtonImage, confidence=0.9, grayscale=True)
-        pyautogui.moveTo(disableSafeModeButtonCoords[0], disableSafeModeButtonCoords[1])
-        pyautogui.mouseDown()
-        time.sleep(.1)
-        pyautogui.mouseUp()
+        disableSafeModeButtonCoords = clickThing(disableSafeModeButtonImage)
         time.sleep(.2)
 
         # find and click cosmetics tab
-        # starts searching 175px above 'disable safe mode' button, looking in a 200px region beneath
-        cosmeticsTabCoords = pyautogui.locateCenterOnScreen(cosmeticsTabImage, confidence=0.8, grayscale=True, region=(0, disableSafeModeButtonCoords[1] - 175, 1920, 200))
-        pyautogui.moveTo(cosmeticsTabCoords[0], cosmeticsTabCoords[1])
-        pyautogui.mouseDown()
-        time.sleep(.05)
-        pyautogui.mouseUp()
+        # (start searching 175px above located 'disable safe mode' button, looking in a 200px region beneath)
+        cosmeticsTabCoords = clickThing(cosmeticsTabImage, confidence=0.8, region=(0, disableSafeModeButtonCoords[1] - 175, 1920, 200))
 
         # find and click ball texture dropdown
-        # starts searching 100px below cosmetics tab, looking in a 500px region beneath
-        dropdownCoords = pyautogui.locateCenterOnScreen(ballTextureDropdownImage, confidence=0.9, grayscale=True, region=(0, cosmeticsTabCoords[1] + 100, 1920, 300))
-        pyautogui.moveTo(dropdownCoords[0], dropdownCoords[1])
-        pyautogui.mouseDown()
-        time.sleep(.05)
-        pyautogui.mouseUp()
+        # (start searching 100px below located cosmetics tab, looking in a 500px region beneath)
+        dropdownCoords = clickThing(ballTextureDropdownImage, region=(0, cosmeticsTabCoords[1] + 100, 1920, 300))
 
         # find and click ball texture 
-        # starts searching 15px below dropdown menu (to avoid false positive in dropdown menu), looking in a 300px region beneath
-        ballSelectionCoords = pyautogui.locateCenterOnScreen(ballSelectionImage, confidence=0.9, grayscale=True, region=(0, dropdownCoords[1] + 15, 1920, 300))
-        pyautogui.moveTo(ballSelectionCoords[0], ballSelectionCoords[1])
-        pyautogui.mouseDown()
-        time.sleep(.05)
-        pyautogui.mouseUp()
+        # (start searching 15px below located dropdown menu (to avoid false positive in dropdown menu), looking in a 300px region beneath)
+        ballSelectionCoords = clickThing(ballSelectionImage, region=(0, dropdownCoords[1] + 15, 1920, 300))
 
         # find and click 'x' button to exit
-        xButtonCoords = pyautogui.locateCenterOnScreen(xButton, confidence=0.9, grayscale=True, region=(0, ballSelectionCoords[1] - 250, 1920, 200))
-        pyautogui.moveTo(xButtonCoords[0], xButtonCoords[1])
-        pyautogui.mouseDown()
-        time.sleep(.05)
-        pyautogui.mouseUp()
+        # (start searching 250px above located ball texture, looking in a 200px region beneath)
+        clickThing(xButton, region=(0, ballSelectionCoords[1] - 250, 1920, 200))
 
     except Exception as e:
         print(e)
