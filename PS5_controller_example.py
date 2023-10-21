@@ -29,6 +29,7 @@ disableSafeModeButtonImage = 'dsm.png'
 cosmeticsTabImage = 'cosmetics_tab.png'
 ballTextureDropdownImage = 'ball_texture_dropdown.png'
 ballSelectionImage = 'ball_selection.png'
+xButton = 'x.png'
 
 # Adjusts chat typing speed (seconds per character) ...
 typingDelay = .002          # 0 makes chats type out instantly (but will cut off long chats)
@@ -271,7 +272,7 @@ def speechToText(microphone):
 
 # Auto click things in AlphaConsole menu to enable ball texture
 def enableBallTexture():
-    time.sleep(.5)
+    time.sleep(.6)
     pyautogui.move(50, 50)
     try:
         # find and click 'disable safe mode' button
@@ -292,7 +293,7 @@ def enableBallTexture():
 
         # find and click ball texture dropdown
         # starts searching 100px below cosmetics tab, looking in a 500px region beneath
-        dropdownCoords = pyautogui.locateCenterOnScreen(ballTextureDropdownImage, confidence=0.9, grayscale=True, region=(0, cosmeticsTabCoords[1] + 100, 1920, 500))
+        dropdownCoords = pyautogui.locateCenterOnScreen(ballTextureDropdownImage, confidence=0.9, grayscale=True, region=(0, cosmeticsTabCoords[1] + 100, 1920, 300))
         pyautogui.moveTo(dropdownCoords[0], dropdownCoords[1])
         pyautogui.mouseDown()
         time.sleep(.05)
@@ -306,12 +307,12 @@ def enableBallTexture():
         time.sleep(.05)
         pyautogui.mouseUp()
 
-        # click outside of menu window (to bring alphaconsole out of focus), then press F5 to exit menu
-        pyautogui.moveTo(25, 25)
+        # find and click 'x' button to exit
+        xButtonCoords = pyautogui.locateCenterOnScreen(xButton, confidence=0.9, grayscale=True, region=(0, ballSelectionCoords[1] - 250, 1920, 200))
+        pyautogui.moveTo(xButtonCoords[0], xButtonCoords[1])
         pyautogui.mouseDown()
         time.sleep(.05)
         pyautogui.mouseUp()
-        pyautogui.press('f5')
 
     except Exception as e:
         print(e)

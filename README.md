@@ -41,4 +41,4 @@ If the script isn't detecting your button presses properly, you may need to edit
 In order to find out which values to use for each button, run `button_value_tester.py` and press each button you want to test. It will give you the correct values.
 
 ### Support
-[Buy me a coffee ☕](https://cash.app/$naptime559) <3
+[Send a tip 🙏](https://cash.app/$naptime559) <3
