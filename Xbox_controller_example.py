@@ -31,7 +31,7 @@ ballTextureDropdownImage = 'ball_texture_dropdown.png'
 ballSelectionImage = 'ball_selection.png'
 xButton = 'x.png'
 
-autoclickAttemptsPerImage = 3
+autoclickAttemptsPerImage = 20
 
 # Adjusts chat typing speed (seconds per character) ...
 typingDelay = .002          # 0 makes chats type out instantly (but will cut off long chats)
@@ -194,9 +194,9 @@ def toggleMacros(button):
         if buttonValue == buttonPressed:
             macrosOn = not macrosOn
             if macrosOn:
-                print('----- quickchat macros toggled on -----\n')
+                print('---------- macros toggled on ----------\n')
             else:
-                print('----- quickchat macros toggled off -----\n')
+                print('---------- macros toggled off ----------\n')
             time.sleep(.2)
 
 def shuffleVariations(key=''):
@@ -283,15 +283,17 @@ def clickThing(image, confidence=0.9, grayscale=True, region=None):
             return imageCoords
         except Exception as e:
             if (i < autoclickAttemptsPerImage - 1):
-                print(f'\ncouldn\'t find {image} on screen ... trying again')
+                print(f'\ncouldn\'t find {image} on screen ... trying again (attempt {i+1})')
             else:
                 print("\nError: ", e)
                 print(f'couldn\'t locate {image} on screen :(')
-            continue
+                # wait 0.1s before trying again
+                time.sleep(.1)
 
 # Auto click things in AlphaConsole menu to enable ball texture
 def enableBallTexture():
-    time.sleep(.3)
+    startTime = time.time()
+    time.sleep(.4)
     pyautogui.move(50, 50)
     try:
         # find and click 'disable safe mode' button
@@ -313,6 +315,8 @@ def enableBallTexture():
         # find and click 'x' button to exit
         # (start searching 250px above located ball texture, looking in a 200px region beneath)
         clickThing(xButton, region=(0, ballSelectionCoords[1] - 250, 1920, 200))
+    
+        print(f'\n<<<<<  Enabled ball texture in {round((time.time() - startTime), 2)}s  >>>>>\n')
 
     except Exception as e:
         print(e)
