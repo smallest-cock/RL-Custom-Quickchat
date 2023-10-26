@@ -291,7 +291,7 @@ def clickThing(image, confidence=0.9, grayscale=True, region=None):
                     print(f'\n[attempt {i+1}] ... couldn\'t find "{image}" in specified region')
             else:
                 print(f'\n[attempt {i+1}] couldn\'t locate "{image}" on screen :(')
-                print(f'\nCheck this guide for a potential fix:\nhttps://github.com/smallest-cock/RL-Custom-Quickchat#troubleshooting--errors')
+                print(f'\nCheck this guide for a potential fix:\nhttps://github.com/smallest-cock/RL-Custom-Quickchat/#autoclicker-isnt-working-correctly\n')
 
 # Auto click things in AlphaConsole menu to enable ball texture
 def enableBallTexture():
