@@ -184,16 +184,13 @@ def speechToText(microphone):
     except sr.WaitTimeoutError:
         print(' -- Listening timed out while waiting for phrase to start -- (you didnt speak within 5s, or your mic is muted)')
         return None
-
     startInterpretationTime = time.time()
-    # set up the response object
     response = {
         "success": True,
         "error": None,
         "transcription": 'my speech recognition failed :(',
         "interpretation time": None
     }
-
     try:
         response["transcription"] = r.recognize_google(audio)
         response["interpretation time"] = time.time() - startInterpretationTime
@@ -210,27 +207,32 @@ def speechToText(microphone):
     except Exception as e:
         print(e)
         return
-
     return response['transcription'].lower()
 
 def clickThing(image, confidence=0.9, grayscale=True, region=None):
+    noRegion = not region
+    lastResort = round(0.6 * autoclickAttemptsPerImage) # last resort will start after 60% of attempts have failed
     for i in range(autoclickAttemptsPerImage):
         try:
             imageCoords = pyautogui.locateCenterOnScreen(image, confidence=confidence, grayscale=grayscale) \
-                if region == None else pyautogui.locateCenterOnScreen(image, confidence=confidence, grayscale=grayscale, region=region)
+                if (noRegion) else pyautogui.locateCenterOnScreen(image, confidence=confidence, grayscale=grayscale, region=region)
             pyautogui.moveTo(imageCoords[0], imageCoords[1])
             pyautogui.mouseDown()
             time.sleep(.05)
             pyautogui.mouseUp()
             return imageCoords
         except Exception as e:
-            if (i < autoclickAttemptsPerImage - 1):
-                print(f'\ncouldn\'t find {image} on screen ... trying again (attempt {i+1})')
+            if (i >= lastResort and i < autoclickAttemptsPerImage - 1):
+                print(f'\n[attempt {i+1}] ... couldn\'t find "{image}" by searching entire screen (slower)')
+                noRegion = True
+            elif (i < lastResort and i < autoclickAttemptsPerImage - 1):
+                if noRegion:
+                    print(f'\n[attempt {i+1}] ... couldn\'t find "{image}" by searching entire screen (slower)')
+                else:
+                    print(f'\n[attempt {i+1}] ... couldn\'t find "{image}" in specified region')
             else:
-                print("\nError: ", e)
-                print(f'couldn\'t locate {image} on screen :(')
-                # wait 0.1s before trying again
-                time.sleep(.1)
+                print(f'\n[attempt {i+1}] couldn\'t locate "{image}" on screen :(')
+                print(f'\nCheck this guide for a potential fix:\nhttps://github.com/smallest-cock/RL-Custom-Quickchat#troubleshooting--errors')
 
 # Auto click things in AlphaConsole menu to enable ball texture
 def enableBallTexture():
@@ -243,29 +245,31 @@ def enableBallTexture():
         time.sleep(.2)
 
         # find and click cosmetics tab
-        # (start searching 175px above located 'disable safe mode' button, looking in a 200px region beneath)
-        cosmeticsTabCoords = clickThing(cosmeticsTabImage, confidence=0.8, region=(0, disableSafeModeButtonCoords[1] - 175, 1920, 200))
+        # (start searching 175px above located 'disable safe mode' button, looking in a 150px region beneath)
+        cosmeticsTabCoords = clickThing(cosmeticsTabImage, confidence=0.8, region=(0, disableSafeModeButtonCoords[1] - 175, screenWidth, 150))
 
         # find and click ball texture dropdown
-        # (start searching 100px below located cosmetics tab, looking in a 500px region beneath)
-        dropdownCoords = clickThing(ballTextureDropdownImage, region=(0, cosmeticsTabCoords[1] + 100, 1920, 300))
+        # (start searching 100px below located cosmetics tab, looking in a 250px region beneath)
+        dropdownCoords = clickThing(ballTextureDropdownImage, region=(0, cosmeticsTabCoords[1] + 100, screenWidth, 250))
 
         # find and click ball texture 
-        # (start searching 15px below located dropdown menu (to avoid false positive in dropdown menu), looking in a 300px region beneath)
-        ballSelectionCoords = clickThing(ballSelectionImage, region=(0, dropdownCoords[1] + 15, 1920, 300))
+        # (start searching 15px below located dropdown menu (to avoid false positive in dropdown menu), looking in a 275px region beneath)
+        ballSelectionCoords = clickThing(ballSelectionImage, region=(0, dropdownCoords[1] + 15, screenWidth, 275))
 
         # find and click 'x' button to exit
-        # (start searching 250px above located ball texture, looking in a 200px region beneath)
-        clickThing(xButton, region=(0, ballSelectionCoords[1] - 250, 1920, 200))
+        # (start searching 250px above located ball texture, looking in a 150px region beneath)
+        clickThing(xButton, region=(0, ballSelectionCoords[1] - 250, screenWidth, 150))
     
         print(f'\n<<<<<  Enabled ball texture in {round((time.time() - startTime), 2)}s  >>>>>\n')
-
+    except TypeError:
+        return
     except Exception as e:
-        print(e)
+        print('Error:', e)
 
 # change working directory to script directory (so .png files are easily located)
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
+screenWidth, screenHeight = pyautogui.size()
 shuffledVariations = variations.copy()
 shuffleVariations()
 pygame.init()
@@ -294,7 +298,7 @@ while True:
 
 
                 
-                toggleMacros('ps') # <-- 'ps' is the button used to toggle on/off quick chat macros (PlayStation button)..... change as you please
+                toggleMacros('ps') # <-- 'ps' is the button used to toggle on/off macros (PlayStation button)..... change as you please
 
                 if macrosOn:
 
