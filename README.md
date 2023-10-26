@@ -61,7 +61,9 @@ The autoclicker (and supplied .png images) were made based on a 1080p screen. If
 - Take your own screenshots and replace the supplied .png images
   - Make sure to crop them similarly and give them the same name
 - Delete the `region=( ... )` parameter inside the `clickThing` function for whatever button isn't being found
-  - [gif here]
+  
+  ![gif_demo](https://github.com/smallest-cock/RL-Custom-Quickchat/assets/48503773/ba8bf2a7-edb1-472f-8275-5d610b75f3e4)
+
   - This will make the autoclicker search the entire screen (rather than a specific region), which is slower but should give better chances at finding the button
 - If you want a better (more performant) fix, you can edit the `region=( ... )` parameter yourself, to search a specific region where you know the button will be on your screen.
   - The structure is `region=(topLeftX, topLeftY, width, height)` where each value would be a number (in pixels)
