@@ -27,13 +27,13 @@ Enables custom quick chats in Rocket League (or any game with chat) using button
 1. Download & install [python](https://www.python.org/getit/). Make sure to check "Add Python 3.x to PATH" and click "Install Now"
 2. Open a Windows cmd (command prompt) and type:
    ```
-   pip install pyautogui pygame pyaudio SpeechRecognition opencv-python
+   pip install pyautogui pygame pyaudio SpeechRecognition opencv-python setuptools
    ```
    This will install the required python packages for the script.
    - To open a command prompt: press the windows button → type "cmd" → hit enter
    - If on KBM, use this command instead:
      ```
-     pip install pyautogui keyboard pyaudio SpeechRecognition opencv-python
+     pip install pyautogui keyboard pyaudio SpeechRecognition opencv-python setuptools
      ```
 3. [Download the code](https://github.com/smallest-cock/RL-Custom-Quickchat/archive/refs/heads/main.zip), extract the zip file, & put the `example.py` file somewhere (the one that applies to you)
    - If you want to rename the .py file, do it before step 4
@@ -61,10 +61,11 @@ The autoclicker (and supplied .png images) were made based on a 1080p screen. If
 - Take your own screenshots and replace the supplied .png images
   - Make sure to crop them similarly and give them the same name
 - Delete the `region=( ... )` parameter inside the `clickThing` function for whatever button isn't being found
-  
+
   ![gif_demo](https://github.com/smallest-cock/RL-Custom-Quickchat/assets/48503773/ba8bf2a7-edb1-472f-8275-5d610b75f3e4)
 
   - This will make the autoclicker search the entire screen (rather than a specific region), which is slower but should give better chances at finding the button
+
 - If you want a better (more performant) fix, you can edit the `region=( ... )` parameter yourself, to search a specific region where you know the button will be on your screen.
   - The structure is `region=(topLeftX, topLeftY, width, height)` where each value would be a number (in pixels)
   - A smaller region generally means a faster search, but make sure the region is large enough to contain the whole .png image
