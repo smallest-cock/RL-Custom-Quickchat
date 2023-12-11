@@ -56,7 +56,13 @@ In order to find out which values to use for each button, run `button_value_test
 
 ### Autoclicker isn't working correctly
 
-The autoclicker (and supplied .png images) were made based on a 1080p screen. If your screen resolution is higher than 1080p then the bakkesmod UI may look different or be positioned differently, causing the autoclicker to fail. You can try any of these fixes:
+#### If you get this error: `PyAutoGUI was unable to import pyscreeze ...`
+
+- Run this command: `pip install -U Pillow` to update the Pillow module to the latest version
+
+#### Other errors:
+
+The autoclicker (and supplied .png images) were made based on a 1080p screen. If your screen resolution is higher than 1080p then the bakkesmod UI may look different or be positioned differently than what's depicted in the images, which can prevent the autoclicker from finding a match. You can try any of these fixes:
 
 - Take your own screenshots and replace the supplied .png images
   - Make sure to crop them similarly and give them the same name

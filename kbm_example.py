@@ -158,6 +158,7 @@ def clickThing(image, confidence=0.9, grayscale=True, region=None):
             pyautogui.mouseUp()
             return imageCoords
         except Exception as e:
+            print(e)
             if (i >= lastResort and i < autoclickAttemptsPerImage - 1):
                 print(f'\n[attempt {i+1}] ... couldn\'t find "{image}" by searching entire screen (slower)')
                 noRegion = True
