@@ -1,6 +1,6 @@
 # RL-Custom-Quickchat
 
-Enables custom quick chats in Rocket League (or any game with chat) using button macros
+Enables custom quick chats in Rocket League using button macros
 
 ## Video Tutorial
 
@@ -23,6 +23,10 @@ Enables custom quick chats in Rocket League (or any game with chat) using button
 - Toggle all macros on/off with one press of a button
 
 ## How to install (for beginners):
+
+### Video tutorial:
+
+[![installation tutorial](https://i.imgur.com/b9ZTJFl_d.webp?maxwidth=760&fidelity=grand)](https://www.youtube.com/watch?v=Epbn-Oste64)
 
 1. Download & install [python](https://www.python.org/getit/). Make sure to check "Add Python 3.x to PATH" and click "Install Now"
 2. Open a Windows cmd (command prompt) and type:
