@@ -89,79 +89,77 @@ def sequence(button1, button2):
     if not type(buttonPressed) is list:
         global firstButtonPressed
         functionCallTime = time.time()
-        for i in range(numJoysticks):
-            if firstButtonPressed['button'] == None:
+        if firstButtonPressed['button'] == None:
+            if buttonPressed == buttons[button1]:
+                firstButtonPressed['time'] = functionCallTime
+                firstButtonPressed['button'] = button1
+                return False
+            else: return False
+        else:
+            if functionCallTime > (firstButtonPressed['time'] + macroTimeWindow):
                 if buttonPressed == buttons[button1]:
                     firstButtonPressed['time'] = functionCallTime
                     firstButtonPressed['button'] = button1
                     return False
-                else: return False
-            else:
-                if functionCallTime > (firstButtonPressed['time'] + macroTimeWindow):
-                    if buttonPressed == buttons[button1]:
-                        firstButtonPressed['time'] = functionCallTime
-                        firstButtonPressed['button'] = button1
-                        return False
-                    else:
-                        resetFirstButtonPressed()
-                        return False
                 else:
-                    if buttonPressed == buttons[button2]:
-                        if button1 == firstButtonPressed['button']:
-                            if (functionCallTime > (firstButtonPressed['time'] + 0.05)):
-                                resetFirstButtonPressed()
-                                return True
-                            else: return False
-                        else: return False   
-                    else: return False
+                    resetFirstButtonPressed()
+                    return False
+            else:
+                if buttonPressed == buttons[button2]:
+                    if button1 == firstButtonPressed['button']:
+                        if (functionCallTime > (firstButtonPressed['time'] + 0.05)):
+                            resetFirstButtonPressed()
+                            return True
+                        else: return False
+                    else: return False   
+                else: return False
     else: return False
 
 # Reads button presses
 def detectButtonPressed():
-    for i in range(numJoysticks):
-        for key in buttons:
-            buttonVal = buttons[key]
-            if controllerHasHats:
-                if buttonPressedIsHat:
-                    if type(buttonVal) is tuple:
-                        if joysticks[i].get_hat(0) == buttonVal:
-                            for otherKey in buttons:
-                                if not (otherKey == key):
-                                    otherButtonVal = buttons[otherKey]
-                                    if type(otherButtonVal) is tuple:
-                                        if joysticks[i].get_hat(0) == otherButtonVal:
-                                            return [buttonVal, otherButtonVal]
-                                    else:
-                                        if joysticks[i].get_button(otherButtonVal):
-                                            return [buttonVal, otherButtonVal]
-                            return buttonVal
-                        else: continue
-                    else: continue
-                else:
-                    if type(buttonVal) is int:
-                        if joysticks[i].get_button(buttonVal):
-                            for otherKey in buttons:
-                                if not (otherKey == key):
-                                    otherButtonVal = buttons[otherKey]
-                                    if type(otherButtonVal) is tuple:
-                                        if joysticks[i].get_hat(0) == otherButtonVal:
-                                            return [buttonVal, otherButtonVal]
-                                    else:
-                                        if joysticks[i].get_button(otherButtonVal):
-                                            return [buttonVal, otherButtonVal]
-                            return buttonVal
-                        else: continue
-                    else: continue
-            else:
-                if not type(buttonVal) is tuple:
-                    if joysticks[i].get_button(buttonVal):
+    for key in buttons:
+        buttonVal = buttons[key]
+        if controllerHasHats:
+            if buttonPressedIsHat:
+                if type(buttonVal) is tuple:
+                    if controller.get_hat(0) == buttonVal:
                         for otherKey in buttons:
                             if not (otherKey == key):
                                 otherButtonVal = buttons[otherKey]
-                                if not type(otherButtonVal) is tuple:
-                                    if joysticks[i].get_button(otherButtonVal):
-                                        return [buttonVal, otherButtonVal]                                    
+                                if type(otherButtonVal) is tuple:
+                                    if controller.get_hat(0) == otherButtonVal:
+                                        return [buttonVal, otherButtonVal]
+                                else:
+                                    if controller.get_button(otherButtonVal):
+                                        return [buttonVal, otherButtonVal]
                         return buttonVal
+                    else: continue
+                else: continue
+            else:
+                if type(buttonVal) is int:
+                    if controller.get_button(buttonVal):
+                        for otherKey in buttons:
+                            if not (otherKey == key):
+                                otherButtonVal = buttons[otherKey]
+                                if type(otherButtonVal) is tuple:
+                                    if controller.get_hat(0) == otherButtonVal:
+                                        return [buttonVal, otherButtonVal]
+                                else:
+                                    if controller.get_button(otherButtonVal):
+                                        return [buttonVal, otherButtonVal]
+                        return buttonVal
+                    else: continue
+                else: continue
+        else:
+            if not type(buttonVal) is tuple:
+                if controller.get_button(buttonVal):
+                    for otherKey in buttons:
+                        if not (otherKey == key):
+                            otherButtonVal = buttons[otherKey]
+                            if not type(otherButtonVal) is tuple:
+                                if controller.get_button(otherButtonVal):
+                                    return [buttonVal, otherButtonVal]                                    
+                    return buttonVal
     return None 
 
 def resetFirstButtonPressed():
@@ -331,15 +329,7 @@ screenWidth, screenHeight = pyautogui.size()
 shuffledVariations = variations.copy()
 shuffleVariations()
 pygame.init()
-pygame.joystick.init()
-joysticks = [pygame.joystick.Joystick(i) for i in range(pygame.joystick.get_count())]
 controllerHasHats = False
-
-for controller in joysticks:
-    if controller.get_numhats() > 0:
-        controllerHasHats = True
-    if controller.get_init() == True:
-        print(f"\n\n~~~~~~ {controller.get_name()} detected ~~~~~~\n\nwaiting for quickchat inputs....\n\n")
 
 # speech recognition init
 r = sr.Recognizer()
@@ -350,9 +340,20 @@ with mic as source:
 while True:
     try:
         for event in pygame.event.get():
-            if (event.type == pygame.JOYBUTTONDOWN) or (event.type == pygame.JOYHATMOTION):
+            if event.type == pygame.JOYDEVICEREMOVED:
+                print('*** Controller disconnected ***\n')
+                controller.quit()
+            elif event.type == pygame.JOYDEVICEADDED:
+                print('*** Controller connected ***')
+                pygame.joystick.init()
+                controller = pygame.joystick.Joystick(0)
+                if controller.get_numhats() > 0:
+                    controllerHasHats = True
+                if controller.get_init() == True:
+                    print(
+                        f"\n\n~~~~~~ {controller.get_name()} detected ~~~~~~\n\nwaiting for quickchat inputs....\n\n")
+            elif (event.type == pygame.JOYBUTTONDOWN) or (event.type == pygame.JOYHATMOTION):
                 buttonPressedIsHat = checkIfPressedButtonIsHat(event)
-                numJoysticks = pygame.joystick.get_count()
                 buttonPressed = detectButtonPressed()
 
 

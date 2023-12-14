@@ -81,41 +81,39 @@ def resetFirstButtonPressed():
 
 # detects simultaneous button presses
 def combine(button1, button2):
-    for i in range(numJoysticks):
-        if joysticks[i].get_button(buttons[button1]) and joysticks[i].get_button(buttons[button2]):
-            resetFirstButtonPressed()
-            return True
-        else: return False
+    if controller.get_button(buttons[button1]) and controller.get_button(buttons[button2]):
+        resetFirstButtonPressed()
+        return True
+    else: return False
 
 # detects successive button presses (buttons pressed in a specific order)
 def sequence(button1, button2):
     global firstButtonPressed
     functionCallTime = time.time()
-    for i in range(numJoysticks):
-        if firstButtonPressed['button'] == None:
-            if joysticks[i].get_button(buttons[button1]):
+    if firstButtonPressed['button'] == None:
+        if controller.get_button(buttons[button1]):
+            firstButtonPressed['time'] = functionCallTime
+            firstButtonPressed['button'] = button1
+            return False
+        else: return False
+    else:
+        if functionCallTime > (firstButtonPressed['time'] + macroTimeWindow):
+            if controller.get_button(buttons[button1]):
                 firstButtonPressed['time'] = functionCallTime
                 firstButtonPressed['button'] = button1
                 return False
-            else: return False
-        else:
-            if functionCallTime > (firstButtonPressed['time'] + macroTimeWindow):
-                if joysticks[i].get_button(buttons[button1]):
-                    firstButtonPressed['time'] = functionCallTime
-                    firstButtonPressed['button'] = button1
-                    return False
-                else:
-                    resetFirstButtonPressed()
-                    return False
             else:
-                if joysticks[i].get_button(buttons[button2]):
-                    if button1 == firstButtonPressed['button']:
-                        if (functionCallTime > (firstButtonPressed['time'] + 0.05)):
-                            resetFirstButtonPressed()
-                            return True
-                        else: return False
-                    else: return False   
-                else: return False
+                resetFirstButtonPressed()
+                return False
+        else:
+            if controller.get_button(buttons[button2]):
+                if button1 == firstButtonPressed['button']:
+                    if (functionCallTime > (firstButtonPressed['time'] + 0.05)):
+                        resetFirstButtonPressed()
+                        return True
+                    else: return False
+                else: return False   
+            else: return False
 
 def quickchat(thing, chatMode='lobby', spamCount=1):
     if not thing: 
@@ -132,15 +130,14 @@ def quickchat(thing, chatMode='lobby', spamCount=1):
         print(e)
 
 def toggleMacros(button):
-    for i in range(numJoysticks):
-        if joysticks[i].get_button(buttons[button]):
-            global macrosOn
-            macrosOn = not macrosOn
-            if macrosOn:
-                print('---------- macros toggled on ----------\n')
-            else:
-                print('---------- macros toggled off ----------\n')
-            time.sleep(.2)
+    if controller.get_button(buttons[button]):
+        global macrosOn
+        macrosOn = not macrosOn
+        if macrosOn:
+            print('---------- macros toggled on ----------\n')
+        else:
+            print('---------- macros toggled off ----------\n')
+        time.sleep(.2)
 
 def shuffleVariations(key=''):
     if not (key == ''):
@@ -274,12 +271,6 @@ screenWidth, screenHeight = pyautogui.size()
 shuffledVariations = variations.copy()
 shuffleVariations()
 pygame.init()
-pygame.joystick.init()
-joysticks = [pygame.joystick.Joystick(i) for i in range(pygame.joystick.get_count())]
-
-for controller in joysticks:
-    if controller.get_init() == True:
-        print(f"\n\n~~~~~~ {controller.get_name()} detected ~~~~~~\n\nwaiting for quickchat inputs....\n\n")
 
 # speech recognition init
 r = sr.Recognizer()
@@ -290,8 +281,17 @@ with mic as source:
 while True:
     try:
         for event in pygame.event.get():
-            if event.type == pygame.JOYBUTTONDOWN:
-                numJoysticks = pygame.joystick.get_count()
+            if event.type == pygame.JOYDEVICEREMOVED:
+                print('*** Controller disconnected ***\n')
+                controller.quit()
+            elif event.type == pygame.JOYDEVICEADDED:
+                print('*** Controller connected ***')
+                pygame.joystick.init()
+                controller = pygame.joystick.Joystick(0)
+                if controller.get_init() == True:
+                    print(
+                        f"\n\n~~~~~~ {controller.get_name()} detected ~~~~~~\n\nwaiting for quickchat inputs....\n\n")
+            elif event.type == pygame.JOYBUTTONDOWN:
 
 
 
