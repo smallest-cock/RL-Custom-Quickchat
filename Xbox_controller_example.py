@@ -290,7 +290,6 @@ def clickThing(image, confidence=0.9, grayscale=True, region=None):
                 print(f'\n[attempt {i+1}] couldn\'t locate "{image}" on screen :(')
                 print(f'\nCheck this guide for a potential fix:\nhttps://github.com/smallest-cock/RL-Custom-Quickchat/#autoclicker-isnt-working-correctly\n')
 
-# Auto click things in AlphaConsole menu to enable ball texture
 def enableBallTexture():
     startTime = time.time()
     time.sleep(.4)
@@ -329,6 +328,7 @@ screenWidth, screenHeight = pyautogui.size()
 shuffledVariations = variations.copy()
 shuffleVariations()
 pygame.init()
+clock = pygame.time.Clock()
 controllerHasHats = False
 
 # speech recognition init
@@ -421,7 +421,7 @@ while True:
                         quickchat(speechToText(mic), chatMode='team')
                         break
 
-                    # enable custom ball texture in a match
+                    # autoclick things in AlphaConsole menu to enable ball texture
                     elif combine('y', 'left'):
                         enableBallTexture()
                         break
@@ -430,3 +430,6 @@ while True:
     except Exception as e:
         print(e)
         break
+
+    # limit pygame refresh rate to "30 FPS" (drastically reduces CPU usage)
+    clock.tick(30)
