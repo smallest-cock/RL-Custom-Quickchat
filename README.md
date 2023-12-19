@@ -1,30 +1,31 @@
 # RL-Custom-Quickchat
 
-Enables custom quick chats in Rocket League using button macros
+Enables custom quick chats (and more) in Rocket League using button macros
 
-## Video Tutorial
+## Video Overview
 
 [![custom quick chats](https://i.imgur.com/U83sQM9.png)](https://youtu.be/G0Lperc-UU0)
 
 ## Features
 
 - Custom quick chats
-- Speech-to-text chats
-  - [Video demonstration](https://youtu.be/cqEdJQ-X7X4)
-- Enable custom ball textures in online matches
+- Custom ball textures in online matches
   - [Video tutorial](https://youtu.be/qjvJxKlpNx0)
-- Create button combination macros (e.g. Circle + Up) or button sequence macros (e.g. Left → Up) for controller
+- Speech-to-text chats
+  - [Video demo](https://youtu.be/cqEdJQ-X7X4)
+- KBM version
+- Create button combination macros (e.g. Circle + Up) or button sequence macros (e.g. Left → Up)
 - Choose how many times to spam a chat
   - Customize spam interval (in seconds)
 - Specify chat mode (lobby/team/party)
 - Add word variations to spice up your chats
-  - e.g. "thx [friend]" ............ where [friend] is a random word from a list containing "homie", "bro", "blud", "my guy", "foo" etc.
-  - Customize the word lists used for variations
+  - "thx [friend]" ........... where [friend] is a random word from a list containing "homie", "bro", "blud", "my guy", "foo" etc.
+  - Easily customize the word lists
 - Toggle all macros on/off with one press of a button
 
 ## How to install (for beginners):
 
-### Video tutorial:
+### Installation video guide:
 
 [![installation tutorial](https://i.imgur.com/b9ZTJFl_d.webp?maxwidth=760&fidelity=grand)](https://www.youtube.com/watch?v=Epbn-Oste64)
 
