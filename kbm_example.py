@@ -171,7 +171,6 @@ def clickThing(image, confidence=0.9, grayscale=True, region=None):
                 print(f'\n[attempt {i+1}] couldn\'t locate "{image}" on screen :(')
                 print(f'\nCheck this guide for a potential fix:\nhttps://github.com/smallest-cock/RL-Custom-Quickchat/#autoclicker-isnt-working-correctly\n')
 
-# Auto click things in AlphaConsole menu to enable ball texture
 def enableBallTexture():
     startTime = time.time()
     time.sleep(.4)
@@ -219,6 +218,10 @@ with mic as source:
     r.adjust_for_ambient_noise(source) # <--- adjusts mic sensitvity for background noise based on a 1s sample of mic audio
 
 while True:
+
+    # blocks loop until a keyboard event happens (drastically reduces CPU usage)
+    keyboard.read_key()
+    
     try:
 
 
@@ -273,7 +276,7 @@ while True:
                 quickchat(speechToText(mic), chatMode='team')
                 continue
 
-            # enable custom ball texture in a match
+            # autoclick things in AlphaConsole menu to enable ball texture
             elif press('pageup'):
                 enableBallTexture()
                 continue
