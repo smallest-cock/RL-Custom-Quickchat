@@ -29,9 +29,9 @@ https://youtu.be/G0Lperc-UU0
 
 ### Installation video guide:
 
-https://www.youtube.com/watch?v=Epbn-Oste64
+https://youtu.be/Epbn-Oste64
 
-[![installation tutorial](https://i.imgur.com/b9ZTJFl_d.webp?maxwidth=760&fidelity=grand)](https://www.youtube.com/watch?v=Epbn-Oste64)
+[![installation tutorial](https://i.imgur.com/b9ZTJFl_d.webp?maxwidth=760&fidelity=grand)](https://youtu.be/Epbn-Oste64)
 
 1. Download & install [python](https://www.python.org/getit/). Make sure to check "Add Python 3.x to PATH" and click "Install Now"
 2. Open a Windows cmd (command prompt) and type:
@@ -65,11 +65,15 @@ In order to find out which values to use for each button, run `button_value_test
 
 ### Autoclicker isn't working correctly
 
+#### If you have multiple displays: make sure RL is being played on the **primary** monitor
+
+- The autoclicker will only work on the primary monitor... so make sure your "main display" is set properly in Windows display settings (or just make sure to play RL on the main display)
+
 #### If you get this error: `PyAutoGUI was unable to import pyscreeze ...`
 
 - Run this command: `pip install -U Pillow` to update the Pillow module to the latest version
 
-#### Other errors:
+#### Screen resolution higher than 1080p
 
 The autoclicker (and supplied .png images) were made based on a 1080p screen. If your screen resolution is higher than 1080p then the bakkesmod UI may look different or be positioned differently than what's depicted in the images, which can prevent the autoclicker from finding a match. You can try any of these fixes:
 
