@@ -327,6 +327,7 @@ def enableBallTexture():
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 screenWidth, screenHeight = pyautogui.size()
+pyautogui.FAILSAFE = False
 shuffledVariations = variations.copy()
 shuffleVariations()
 pygame.init()
