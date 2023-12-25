@@ -6,7 +6,9 @@ Enables custom quick chats (and more) in Rocket League using button macros
 
 https://youtu.be/G0Lperc-UU0
 
-[![custom quick chats](https://i.imgur.com/U83sQM9.png)](https://youtu.be/G0Lperc-UU0)
+<a href='https://youtu.be/G0Lperc-UU0'>
+  <img src='https://i.imgur.com/U83sQM9.png' alt="overview" width="500"/>
+</a>
 
 ## Features
 
@@ -34,6 +36,7 @@ https://youtu.be/Epbn-Oste64
 [![installation tutorial](https://i.imgur.com/b9ZTJFl_d.webp?maxwidth=760&fidelity=grand)](https://youtu.be/Epbn-Oste64)
 
 1. Download & install [python](https://www.python.org/getit/). Make sure to check "Add Python 3.x to PATH" and click "Install Now"
+
 2. Open a Windows cmd (command prompt) and type:
    ```
    pip install pyautogui pygame pyaudio SpeechRecognition opencv-python setuptools
@@ -48,6 +51,7 @@ https://youtu.be/Epbn-Oste64
    - If you want to rename the .py file, do it before step 4
    - Put all the .png images (for the autoclicker) in the same folder as your .py file if you want to use the feature which enables custom ball texures in matches
 4. Right-click the .py file → Create shortcut
+
 5. Right-click the shortcut → Properties → Target: → add the word "python" to the beginning, so it looks like: `python "C:\Users\....."`. Click Apply.
    - You can also change Run: → Minimized to have it start minimized
 6. Leave the script running any time you want to use custom quick chats or custom ball textures in matches :)
@@ -55,40 +59,44 @@ https://youtu.be/Epbn-Oste64
 
 ## Troubleshooting / Errors:
 
-### Macros not being detected
-
-If the script isn't detecting your button presses properly, you may need to edit the `buttons` dictionary in your script:
-
-![buttonslist](https://github.com/smallest-cock/RL-Custom-Quickchat/assets/48503773/9ccc127d-c148-463a-8992-cbc14e33e19a)
-
-In order to find out which values to use for each button, run `button_value_tester.py` and press each button you want to test. It will give you the correct values.
-
 ### Autoclicker isn't working correctly
 
-#### If you have multiple displays: make sure RL is being played on the **primary** monitor
+#### If you have multiple displays:
 
-- The autoclicker will only work on the primary monitor... so make sure your "main display" is set properly in Windows display settings (or just make sure to play RL on the main display)
+- Make sure RL is running on the **primary** monitor
+
+- PyAutoGUI (the autoclicker) only works on the primary monitor. So make sure your "main display" is set correctly in Windows display settings (or just make sure to play RL on the main display)
+
+#### If your screen resolution is higher than 1080p:
+
+The supplied .png images were made using screenshots of a 1080p screen. If your screen resolution is above 1080p the bakkesmod UI may look different or be positioned differently than what's depicted in the images, which can prevent the autoclicker from finding a match. You can try any of these fixes:
+
+- Take your own screenshots and replace the supplied .png images
+  - Make sure to crop them similarly and give them the same name
+- Delete the `region=( ... )` argument in the `clickThing` function for whatever image isn't being found
+
+  ![gif_demo](https://github.com/smallest-cock/RL-Custom-Quickchat/assets/48503773/ba8bf2a7-edb1-472f-8275-5d610b75f3e4)
+
+  - This will make the autoclicker search the entire screen (rather than a specific region), which is slower but should give better chances at finding the image
+
+- If you want a better (more performant) fix you can edit the `region=( ... )` argument yourself, to search a specific region on your screen where you know the image will be.
+  - The structure is `region=(topLeftX, topLeftY, width, height)` where each value is a number (in pixels)
+  - A smaller region generally means a faster search, but make sure the region is large enough to contain the whole .png image
 
 #### If you get this error: `PyAutoGUI was unable to import pyscreeze ...`
 
 - Run this command: `pip install -U Pillow` to update the Pillow module to the latest version
 
-#### Screen resolution higher than 1080p
+### Macros not being detected
 
-The autoclicker (and supplied .png images) were made based on a 1080p screen. If your screen resolution is higher than 1080p then the bakkesmod UI may look different or be positioned differently than what's depicted in the images, which can prevent the autoclicker from finding a match. You can try any of these fixes:
+If the script isn't detecting your button presses properly, you may need to edit the `buttons` dictionary:
 
-- Take your own screenshots and replace the supplied .png images
-  - Make sure to crop them similarly and give them the same name
-- Delete the `region=( ... )` parameter inside the `clickThing` function for whatever button isn't being found
+<img src="https://github.com/smallest-cock/RL-Custom-Quickchat/assets/48503773/9ccc127d-c148-463a-8992-cbc14e33e19a" alt="drawing" width="500"/>
 
-  ![gif_demo](https://github.com/smallest-cock/RL-Custom-Quickchat/assets/48503773/ba8bf2a7-edb1-472f-8275-5d610b75f3e4)
-
-  - This will make the autoclicker search the entire screen (rather than a specific region), which is slower but should give better chances at finding the button
-
-- If you want a better (more performant) fix, you can edit the `region=( ... )` parameter yourself, to search a specific region where you know the button will be on your screen.
-  - The structure is `region=(topLeftX, topLeftY, width, height)` where each value would be a number (in pixels)
-  - A smaller region generally means a faster search, but make sure the region is large enough to contain the whole .png image
+In order to find the right values, run `button_value_tester.py` and press each button you want to test. It will give you the correct values.
 
 ## Support
 
-[Drop a tip 🙏](https://cash.app/$naptime559) <3
+[Drop a tip 🙏](https://cash.app/$naptime559)
+
+<3
