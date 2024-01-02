@@ -363,7 +363,7 @@ while True:
 
 
 
-                toggleMacros('y') # <-- 'y' is the button used to toggle on/off macros (Xbox Y button)..... change as you please
+                toggleMacros('back') # <-- 'back' is the button used to toggle on/off macros (Xbox back button)..... change as you please
 
                 if macrosOn:
                     
@@ -432,5 +432,5 @@ while True:
         print(e)
         break
 
-    # limit pygame refresh rate to "30 FPS" (drastically reduces CPU usage)
-    clock.tick(30)
+    # limit pygame refresh rate to "25 FPS" (drastically reduces CPU usage)
+    clock.tick(25)
