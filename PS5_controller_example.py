@@ -51,22 +51,42 @@ chatKeys = {
     'party': 'u'
 }
 
-# PS5 controller button mappings for pygame.... these may be incorrect because I dont own a PS5 controller  (refer to https://www.pygame.org/docs/ref/joystick.html)
+# PS5 Dualsense controller button mappings for pygame
 buttons = {
     'x': 0,
     'circle': 1,
     'square': 2,
     'triangle': 3,
-    'L1': 4,
-    'R1': 5,
-    'share': 8, 
-    'options': 9,
-    'ps': 10,
-    'up': (0, 1), 
-    'down': (0, -1), 
-    'left': (-1, 0), 
-    'right': (1, 0) 
+    'light': 4,
+    'ps': 5,
+    'options': 6,
+    'left stick': 7,
+    'right stick': 8,
+    'L1': 9,
+    'R1': 10,
+    'up': 11,
+    'down': 12,
+    'left': 13,
+    'right': 14,
+    'touchpad': 15,
+    'mic': 16
 }
+
+# buttons = {
+#     'x': 0,
+#     'circle': 1,
+#     'square': 2,
+#     'triangle': 3,
+#     'L1': 4,
+#     'R1': 5,
+#     'share': 8,            # <--- These button mappings are apparently incorrect/outdated. But maybe worth a try if the above mappings dont work
+#     'options': 9,
+#     'ps': 10,
+#     'up': (0, 1), 
+#     'down': (0, -1), 
+#     'left': (-1, 0), 
+#     'right': (1, 0)
+# }
 
 firstButtonPressed = {
     'button': None,
@@ -76,101 +96,70 @@ firstButtonPressed = {
 macrosOn = True
 
 # Triggers on simultaneous button/hat presses
-def combine(button1, button2):
-    if type(buttonPressed) is list:
-        button1Value = buttons[button1]
-        button2Value = buttons[button2]
-        if (button1Value in buttonPressed) and (button2Value in buttonPressed):
-            return True
-        else: return False
-    else: return False
+def combine(*buttons):
+    for button in buttons:
+        if not (button in pressedButtons):
+            return False
+    return True
 
-# Triggers on successive button/hat presses (buttons pressed in a specific order)
+# Triggers on successive button/hat presses (buttons pressed in a specific order)... limited to a 2 button sequence
 def sequence(button1, button2):
-    if not type(buttonPressed) is list:
+    button1Pressed = button1 in pressedButtons
+    button2Pressed = button2 in pressedButtons
+    if button1Pressed or button2Pressed:
         global firstButtonPressed
         functionCallTime = time.time()
         if firstButtonPressed['button'] == None:
-            if buttonPressed == buttons[button1]:
+            if button1Pressed:
                 firstButtonPressed['time'] = functionCallTime
                 firstButtonPressed['button'] = button1
-                return False
-            else: return False
         else:
-            if functionCallTime > (firstButtonPressed['time'] + macroTimeWindow):
-                if buttonPressed == buttons[button1]:
+            if functionCallTime > (firstButtonPressed['time'] + macroTimeWindow):   # if the button was pressed after (outside) the macro time window
+                if button1Pressed:
                     firstButtonPressed['time'] = functionCallTime
                     firstButtonPressed['button'] = button1
-                    return False
                 else:
                     resetFirstButtonPressed()
-                    return False
-            else:
-                if buttonPressed == buttons[button2]:
+            else:                                                                   # if the button was pressed within the macro time window
+                if button2Pressed:
                     if button1 == firstButtonPressed['button']:
                         if (functionCallTime > (firstButtonPressed['time'] + 0.05)):
                             resetFirstButtonPressed()
                             return True
-                        else: return False
-                    else: return False   
-                else: return False
-    else: return False
+    return False
 
-# Reads button presses
-def detectButtonPressed():
-    for key in buttons:
-        buttonVal = buttons[key]
-        if controllerHasHats:
-            if buttonPressedIsHat:
-                if type(buttonVal) is tuple:
-                    if controller.get_hat(0) == buttonVal:
-                        for otherKey in buttons:
-                            if not (otherKey == key):
-                                otherButtonVal = buttons[otherKey]
-                                if type(otherButtonVal) is tuple:
-                                    if controller.get_hat(0) == otherButtonVal:
-                                        return [buttonVal, otherButtonVal]
-                                else:
-                                    if controller.get_button(otherButtonVal):
-                                        return [buttonVal, otherButtonVal]
-                        return buttonVal
-                    else: continue
-                else: continue
-            else:
-                if type(buttonVal) is int:
-                    if controller.get_button(buttonVal):
-                        for otherKey in buttons:
-                            if not (otherKey == key):
-                                otherButtonVal = buttons[otherKey]
-                                if type(otherButtonVal) is tuple:
-                                    if controller.get_hat(0) == otherButtonVal:
-                                        return [buttonVal, otherButtonVal]
-                                else:
-                                    if controller.get_button(otherButtonVal):
-                                        return [buttonVal, otherButtonVal]
-                        return buttonVal
-                    else: continue
-                else: continue
-        else:
-            if not type(buttonVal) is tuple:
-                if controller.get_button(buttonVal):
-                    for otherKey in buttons:
-                        if not (otherKey == key):
-                            otherButtonVal = buttons[otherKey]
-                            if not type(otherButtonVal) is tuple:
-                                if controller.get_button(otherButtonVal):
-                                    return [buttonVal, otherButtonVal]                                    
-                    return buttonVal
-    return None 
+# determine if a specific button is pressed
+def isPressed(button):
+    val = buttons[button]
+    if type(val) is int:
+        try:
+            if controller.get_button(val):
+                return True
+        except Exception:
+            return False
+    elif type(val) is tuple:
+        if numHatsOnController > 0:
+            try:
+                for i in range(numHatsOnController):
+                    if controller.get_hat(i) == val:
+                        return True
+            except Exception:
+                return False
+    return False
+
+# return a list of all buttons pressed
+def getAllButtonsPressed():
+    pressedButtons = []
+    for buttonName in buttons:
+        if isPressed(buttonName):
+            pressedButtons.append(buttonName)
+    # if pressedButtons:                                      # <---- uncomment these 2 lines to test if your button mappings are valid
+    #     print("pressedButtons:", pressedButtons)
+    return pressedButtons
 
 def resetFirstButtonPressed():
     firstButtonPressed['button'] = None     
     firstButtonPressed['time'] = 420
-
-def checkIfPressedButtonIsHat(event):
-    if event.type == pygame.JOYHATMOTION:
-        return True
-    else: return False
 
 def quickchat(thing, chatMode='lobby', spamCount=1):
     if not thing: 
@@ -187,16 +176,11 @@ def quickchat(thing, chatMode='lobby', spamCount=1):
         print(e)
 
 def toggleMacros(button):
-    global macrosOn
-    if not type(buttonPressed) is list:
-        buttonValue = buttons[button]
-        if buttonValue == buttonPressed:
-            macrosOn = not macrosOn
-            if macrosOn:
-                print('---------- macros toggled on ----------\n')
-            else:
-                print('---------- macros toggled off ----------\n')
-            time.sleep(.2)
+    if button in pressedButtons:
+        global macrosOn
+        macrosOn = not macrosOn
+        print(f'---------- macros toggled {"on" if macrosOn else "off"} ----------\n')
+        time.sleep(.2)
 
 def shuffleVariations(key=''):
     if not (key == ''):
@@ -332,7 +316,6 @@ shuffledVariations = variations.copy()
 shuffleVariations()
 pygame.init()
 clock = pygame.time.Clock()
-controllerHasHats = False
 
 # speech recognition init
 r = sr.Recognizer()
@@ -350,14 +333,13 @@ while True:
                 print('*** Controller connected ***')
                 pygame.joystick.init()
                 controller = pygame.joystick.Joystick(0)
-                if controller.get_numhats() > 0:
-                    controllerHasHats = True
+                numHatsOnController = controller.get_numhats()
+                print("\nNumber of hats on controller:", numHatsOnController)     # useful for determining if buttons dict needs tuple values
                 if controller.get_init() == True:
                     print(
                         f"\n\n~~~~~~ {controller.get_name()} detected ~~~~~~\n\nwaiting for quickchat inputs....\n\n")
             elif (event.type == pygame.JOYBUTTONDOWN) or (event.type == pygame.JOYHATMOTION):
-                buttonPressedIsHat = checkIfPressedButtonIsHat(event)
-                buttonPressed = detectButtonPressed()
+                pressedButtons = getAllButtonsPressed()
 
 
 
@@ -369,47 +351,47 @@ while True:
 
                 if macrosOn:
                     
-                    # on square + x, types "let me cook"
-                    if combine('square', 'x'):
+                    # on square + up + R1, types "let me cook"
+                    if combine('square', 'up', 'R1'):             # <--- you can now put any amount of buttons inside combine(...)
                         quickchat('let me cook')
                         break
                 
                     # on square + left, types "dont lose this kickoff" (spamming 2 times)
                     elif combine('square', 'left'):
-                        quickchat('dont lose this kickoff', spamCount=2)  # <-- the '2' parameter is how many times the chat will be spammed.. the max you can put is 3 (before RL gives a chat timeout)
+                        quickchat('dont lose this kickoff', spamCount=2)  # <-- the '2' is how many times the chat will be spammed.. the max you can put is 3 (before RL gives a chat timeout)
                         break
                     
-                    # on circle + square, types "tell me how you really feel..." (using team chat)
-                    elif combine('circle', 'square'):
+                    # on circle + up, types "tell me how you really feel..." (using team chat)
+                    elif combine('circle', 'up'):
                         quickchat('tell me how you really feel...', chatMode='team')
                         break
                     
-                    # on x -> circle, types "im lagging" (using team chat, spamming 3 times)
+                    # on x → circle, types "im lagging" (using team chat, spamming 3 times)
                     elif sequence('x', 'circle'):
                         quickchat('im lagging', chatMode='team', spamCount=3)
                         break
                     
-                    # on up -> left, types "im gay" (using party chat)
+                    # on up → left, types "im gay" (using party chat)
                     elif sequence('up', 'left'):
                         quickchat('im gay', chatMode='party')
                         break
 
-                    # on left -> left, types "Word variations are [compliment]!"  ..... where [compliment] is a random word from the 'compliment' variations list above
+                    # on left → left, types "Word variations are [compliment]!"  ..... where [compliment] is a random word from the 'compliment' variations list above
                     elif sequence('left', 'left'):
                         quickchat(f'Word variations are {variation("compliment")}!')    # <-- One way to include word variations in your chats (notice the 'f' at the beginning of the string)
                         break
 
-                    # on down -> left, types "ok [foe]!!!"  ..... where [foe] is a random word from the 'foe' variations list above
+                    # on down → left, types "ok [foe]!!!"  ..... where [foe] is a random word from the 'foe' variations list above
                     elif sequence('down', 'left'):
                         quickchat('ok ' + variation('foe') + '!!!')    # <-- Another way to format word variations in your chats
                         break
                     
-                    # on L1 + right, types "Wassup [friend]! Nice to see you again."
-                    elif combine('L1', 'right'):
-                        quickchat('Wassup %s! Nice to see you again.' % variation('friend'))    # <-- Yet another way to format word variations in your chats
+                    # on L1 + up + square, types "Hey [friend]! I want you to know I'm gay."
+                    elif combine('L1', 'up', 'square'):      # <---- combine(...) can take any number of buttons :)
+                        quickchat('Hey %s! I want you to know I\'m gay.' % variation('friend'))
                         break
                     
-                    # on down -> up, types a random cat fact (from the list of 'cat fact' variations above)
+                    # on down → up, types a random cat fact (from the list of 'cat fact' variations above)
                     elif sequence('down', 'up'):
                         quickchat(variation('cat fact'))
                         break
@@ -428,11 +410,11 @@ while True:
                     elif combine('triangle', 'left'):
                         enableBallTexture()
                         break
-                    
+
 
     except Exception as e:
         print(e)
         break
 
-    # limit pygame refresh rate to "25 FPS" (drastically reduces CPU usage)
+    # limit pygame refresh rate to "25 FPS" ... reduces CPU usage :)
     clock.tick(25)

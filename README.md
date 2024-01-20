@@ -18,7 +18,8 @@ https://youtu.be/G0Lperc-UU0
 - Speech-to-text chats
   - [Video demo](https://youtu.be/cqEdJQ-X7X4)
 - KBM version
-- Create button combination macros (e.g. Circle + Up) or button sequence macros (e.g. Left → Up)
+- Create button combination macros (Circle + Up) or button sequence macros (Left → Down)
+  - Can use any amount of buttons in button combination macros (e.g. L1 + Up + Square)
 - Choose how many times to spam a chat
   - Customize spam interval (in seconds)
 - Specify chat mode (lobby/team/party)
@@ -97,6 +98,4 @@ In order to find the right values, run `button_value_tester.py` and press each b
 
 ## Support
 
-[Drop a tip 🙏](https://cash.app/$naptime559)
-
-<3
+[Drop a tip <3](https://cash.app/$naptime559)
