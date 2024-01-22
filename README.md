@@ -30,10 +30,16 @@ https://youtu.be/G0Lperc-UU0
 
 ## How to install:
 
+### Installation video guide:
+
+https://youtu.be/qdeey4lyZo0
+
+[![installation tutorial](https://i.imgur.com/Cg4CHke.png)](https://youtu.be/qdeey4lyZo0)
+
 1. Download & install [python](https://www.python.org/getit/). Make sure to check "**Add python.exe to PATH**" and click "**Install Now**"
 
 2. [Download the code](https://github.com/smallest-cock/RL-Custom-Quickchat/archive/refs/heads/main.zip), extract the zip file, and run `install.bat`
-   - This will install the python packages used by the script, and put the script into a folder called `Quickchats Script` on your desktop
+   - This will install the python packages used by the script, and create an installation folder called `Quickchats Script` on your desktop
    - If you encounter any errors, try running as Administrator 
    - If you want to rename the example .py file, do it before step 3
 
