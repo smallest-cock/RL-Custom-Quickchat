@@ -1,0 +1,7 @@
+keyboard
+opencv-python
+pyaudio
+pyautogui
+pygame
+setuptools
+SpeechRecognition

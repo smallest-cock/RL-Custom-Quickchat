@@ -19,48 +19,35 @@ https://youtu.be/G0Lperc-UU0
   - [Video demo](https://youtu.be/cqEdJQ-X7X4)
 - KBM version
 - Create button combination macros (Circle + Up) or button sequence macros (Left → Down)
-  - Can use any amount of buttons in button combination macros (e.g. L1 + Up + Square)
+  - Button combo macros will work with any amount of buttons (e.g. L1 + Up + Square + R1)
 - Choose how many times to spam a chat
   - Customize spam interval (in seconds)
 - Specify chat mode (lobby/team/party)
 - Add word variations to spice up your chats
-  - "thx [friend]" ........... where [friend] is a random word from a list containing "homie", "bro", "blud", "my guy", "foo" etc.
-  - Easily customize the word lists
+  - "thx [friend]" .... where [friend] is a random word like "homie", "blud", "bro", "my guy", etc.
+  - Easily customize with word lists
 - Toggle all macros on/off with one press of a button
 
-## How to install (for beginners):
+## How to install:
 
-### Installation video guide:
+1. Download & install [python](https://www.python.org/getit/). Make sure to check "**Add python.exe to PATH**" and click "**Install Now**"
 
-https://youtu.be/Epbn-Oste64
+2. [Download the code](https://github.com/smallest-cock/RL-Custom-Quickchat/archive/refs/heads/main.zip), extract the zip file, and run `install.bat`
+   - This will install the python packages used by the script, and put the script into a folder called `Quickchats Script` on your desktop
+   - If you encounter any errors, try running as Administrator 
+   - If you want to rename the example .py file, do it before step 3
 
-[![installation tutorial](https://i.imgur.com/b9ZTJFl_d.webp?maxwidth=760&fidelity=grand)](https://youtu.be/Epbn-Oste64)
+3. Store `Quickchats Script` wherever you want on your PC → Open it → Right-click the example script → Create shortcut
 
-1. Download & install [python](https://www.python.org/getit/). Make sure to check "Add Python 3.x to PATH" and click "Install Now"
-
-2. Open a Windows cmd (command prompt) and type:
-   ```
-   pip install pyautogui pygame pyaudio SpeechRecognition opencv-python setuptools
-   ```
-   This will install the required python packages for the script.
-   - To open a command prompt: press the windows button → type "cmd" → hit enter
-   - If on KBM, use this command instead:
-     ```
-     pip install pyautogui keyboard pyaudio SpeechRecognition opencv-python setuptools
-     ```
-3. [Download the code](https://github.com/smallest-cock/RL-Custom-Quickchat/archive/refs/heads/main.zip), extract the zip file, & put the `example.py` file somewhere (the one that applies to you)
-   - If you want to rename the .py file, do it before step 4
-   - Put all the .png images (for the autoclicker) in the same folder as your .py file if you want to use the feature which enables custom ball texures in matches
-4. Right-click the .py file → Create shortcut
-
-5. Right-click the shortcut → Properties → Target: → add the word "python" to the beginning, so it looks like: `python "C:\Users\....."`. Click Apply.
+4. Right-click the shortcut → Properties → Target: → add the word "python" to the beginning, so it looks like: `python "C:\Users\....."`. Click Apply.
    - You can also change Run: → Minimized to have it start minimized
-6. Leave the script running any time you want to use custom quick chats or custom ball textures in matches :)
-   - Edit the .py file to change quick chats, macros, etc.
+
+5. Leave the script running any time you want to use it :)
+   - Edit the example script to customize quick chats, macros, etc.
 
 ## Troubleshooting / Errors:
 
-### Autoclicker isn't working correctly
+### Autoclicker not working correctly
 
 #### If you have multiple displays:
 
@@ -74,15 +61,15 @@ The supplied .png images were made using screenshots of a 1080p screen. If your 
 
 - Take your own screenshots and replace the supplied .png images
   - Make sure to crop them similarly and give them the same name
-- Delete the `region=( ... )` argument in the `clickThing` function for whatever image isn't being found
-
+- Find `functions.py` → `def enableBallTexture():` → `clickThing(...)` for whatever image isn't being found, and delete the `region=(...)` argument
+  
   ![gif_demo](https://github.com/smallest-cock/RL-Custom-Quickchat/assets/48503773/ba8bf2a7-edb1-472f-8275-5d610b75f3e4)
 
   - This will make the autoclicker search the entire screen (rather than a specific region), which is slower but should give better chances at finding the image
 
-- If you want a better (more performant) fix you can edit the `region=( ... )` argument yourself, to search a specific region on your screen where you know the image will be.
-  - The structure is `region=(topLeftX, topLeftY, width, height)` where each value is a number (in pixels)
-  - A smaller region generally means a faster search, but make sure the region is large enough to contain the whole .png image
+  - If you want a better (more performant) fix you can edit the `region=(...)` argument yourself, to search a specific region on your screen where you know the image will be.
+    - The structure is `region=(topLeftX, topLeftY, width, height)` where each value is a number (in pixels)
+    - A smaller region generally means a faster search, but make sure the region is large enough to contain the whole .png image
 
 #### If you get this error: `PyAutoGUI was unable to import pyscreeze ...`
 
@@ -94,7 +81,7 @@ If the script isn't detecting your button presses properly, you may need to edit
 
 <img src="https://github.com/smallest-cock/RL-Custom-Quickchat/assets/48503773/9ccc127d-c148-463a-8992-cbc14e33e19a" alt="drawing" width="500"/>
 
-In order to find the right values, run `button_value_tester.py` and press each button you want to test. It will give you the correct values.
+In order to find the right values, run `controller_button_tester.py` and press each button you want to test. It will give you the correct values.
 
 ## Support
 
