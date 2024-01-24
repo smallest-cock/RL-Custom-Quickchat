@@ -4,68 +4,11 @@ import pyautogui
 from random import sample
 import speech_recognition as sr
 
-mainScriptData = {}
-shuffledVariations = {}
-
-controller = None
-numHatsOnController : int = 0
-pressedButtons : list = []
-macrosOn = True
-
-firstButtonPressed = {
-    'button': None,
-    'time': 420
-}
-
-def syncData(data: dict):
-    global mainScriptData
-    global shuffledVariations
-    mainScriptData = data.copy()
-    shuffledVariations = mainScriptData["variations"].copy()
-
-def macrosAreOn():
-    return macrosOn
-
-def shuffleVariations(key=''):
-    global shuffledVariations
-    if not (key == ''):
-        lastWordUsed = shuffledVariations[key]['randomizedList'][len(
-            mainScriptData["variations"][key]) - 1]
-        secondLastWordUsed = shuffledVariations[key]['randomizedList'][len(
-            mainScriptData["variations"][key]) - 2]
-        while True:
-            shuffledList = sample(mainScriptData["variations"][key], len(mainScriptData["variations"][key]))
-            if not (shuffledList[0] == lastWordUsed) and (shuffledList[1] == secondLastWordUsed):
-                shuffledVariations[key]['randomizedList'] = shuffledList
-                shuffledVariations[key]['nextUsableIndex'] = 0
-                break
-    else:
-        for key in mainScriptData["variations"]:
-            shuffledVariations[key] = {
-                'randomizedList': sample(mainScriptData["variations"][key], len(mainScriptData["variations"][key])),
-                'nextUsableIndex': 0
-            }
-
-def variation(variationListName: str):
-    global shuffledVariations
-    index = shuffledVariations[variationListName]['nextUsableIndex']
-    if not len(shuffledVariations[variationListName]['randomizedList']) > 2:
-        print(f'The "{variationListName}" variation list has less than 3 items..... it cannot be used properly!! Please add more items (words/phrases)')
-        return '-- "' + variationListName + '" variation list needs more items --'
-    else:
-        if index < (len(shuffledVariations[variationListName]['randomizedList'])):
-            randWord = shuffledVariations[variationListName]['randomizedList'][index]
-            shuffledVariations[variationListName]['nextUsableIndex'] += 1
-            return randWord
-        else:
-            shuffleVariations(variationListName)
-            randWord = shuffledVariations[variationListName]['randomizedList'][0]
-            shuffledVariations[variationListName]['nextUsableIndex'] += 1
-            return randWord
 
 
-# ------------------------------------------- KBM specific ---------------------------------------------
+# ------------------------------------------  KBM specific  -------------------------------------------------------------------------------
     
+
 def press(button):
     return keyboard.is_pressed(button)
 
@@ -76,7 +19,9 @@ def toggleKbmMacros(button):
         print(f'---------- macros toggled {"on" if macrosOn else "off"} ----------\n')
         time.sleep(.2)
 
-# --------------------------------------------- controller specific ---------------------------------------------
+
+# ------------------------------------------  controller specific  ------------------------------------------------------------------------
+
 
 # determine if a button combination has been pressed
 def combine(*buttons):
@@ -165,7 +110,190 @@ def resetFirstButtonPressed():
     firstButtonPressed["button"] = None
     firstButtonPressed['time'] = 420
 
-# ---------------------------------------------------------------------------------------------------------------
+
+# ------------------------------------------  autoclicker functions  ----------------------------------------------------------------------
+
+
+def clickImage(image, confidence=0.9, grayscale=True, region=None):
+    noRegion = not region
+    attempts = mainScriptData["autoclickAttemptsPerImage"]
+    lastResort = round(0.3 * attempts)      # last resort will kick in after 30% of attempts have failed
+    for i in range(attempts):
+        try:
+            imageCoords = pyautogui.locateCenterOnScreen(image, confidence=confidence, grayscale=grayscale) \
+                if (noRegion) else pyautogui.locateCenterOnScreen(image, confidence=confidence, grayscale=grayscale, region=region)
+            pyautogui.mouseDown(imageCoords[0], imageCoords[1])
+            pyautogui.sleep(.05)
+            pyautogui.mouseUp()
+            return imageCoords
+        except Exception as e:
+            print(e)
+            if (i >= lastResort and i < attempts - 1):
+                print(f'\n[attempt {i+1}] ... couldn\'t find "{image}" by searching entire screen (slower)')
+                noRegion = True
+            elif (i < lastResort and i < attempts - 1):
+                if noRegion:
+                    print(f'\n[attempt {i+1}] ... couldn\'t find "{image}" by searching entire screen (slower)')
+                else:
+                    print(f'\n[attempt {i+1}] ... couldn\'t find "{image}" in region {region}')
+            else:
+                print(f'\n[attempt {i+1}] couldn\'t locate "{image}" on screen :(')
+                print(f'\nCheck this guide for a potential fix:\nhttps://github.com/smallest-cock/RL-Custom-Quickchat/#autoclicker-not-working-correctly\n')
+        pyautogui.sleep(.1)
+
+def clickCoord(coordTuple):
+    pyautogui.mouseDown(coordTuple[0], coordTuple[1])
+    pyautogui.sleep(.05)
+    pyautogui.mouseUp()
+
+def checkWithinScreenBounds(top, height):
+    return ((top >= 0) and (top <= screenHeight)) and ((top + height >= 0) and (top + height <= screenHeight))
+
+def getRegion(image, prevImageCoords):
+    match image:
+        case 'cosmeticsTab':
+            return (0, prevImageCoords[1] - 175, screenWidth, 150) if checkWithinScreenBounds(prevImageCoords[1] - 175, 150) else None
+        case 'ballTextureDropdown':
+            return (0, prevImageCoords[1] + 100, screenWidth, 250) if checkWithinScreenBounds(prevImageCoords[1] + 100, 250) else None
+        case 'ballSelection':
+            return (0, prevImageCoords[1] + 15, screenWidth, 275) if checkWithinScreenBounds(prevImageCoords[1] + 15, 275) else None
+        case 'xButton':
+            return (0, prevImageCoords[1] - 250, screenWidth, 150) if checkWithinScreenBounds(prevImageCoords[1] - 250, 150) else None
+
+def findWhereAutoclickerLeftOff():
+    leftOff =  {
+        "image": None,
+        "coords": None
+    }
+    for key, val in mainScriptData["autoclickerImages"].items():
+        try:
+            leftOff["coords"] = pyautogui.locateCenterOnScreen(val, confidence=.9, grayscale=True)
+            leftOff["image"] = key
+            break
+        except Exception as e:
+            print(e)
+    return leftOff
+
+# finish a failed autoclick job using reliable image search method
+def cleanUpFailedAutoclickJob(startTime):
+    leftOff = findWhereAutoclickerLeftOff()
+    shouldProceed = False
+    foundImageCoords = leftOff["coords"]
+    if foundImageCoords:
+        for key, val in mainScriptData["autoclickerImages"].items():
+            if key == leftOff["image"]:
+                shouldProceed = True
+            try:
+                if shouldProceed:
+                    if key == 'disableSafeMode' or not foundImageCoords:
+                        foundImageCoords = clickImage(val)
+                    else:
+                        foundImageCoords = clickImage(val, region=getRegion(key, foundImageCoords))
+            except Exception as e:
+                print(e)
+    print(f'\n<<<<<  Enabled ball texture in {round((time.perf_counter() - startTime), 2)}s (fast method failed... position/size of AlphaConsole menu changed)  >>>>>\n')
+
+def autoclickUsingCoordList(foundButtonCoords: dict, startTime):
+    for button, coords in foundButtonCoords.items():
+        if button == 'disableSafeMode':
+            clickCoord(coords)
+            pyautogui.sleep(.2)
+        else:
+            clickCoord(coords)
+    endTime = time.perf_counter() - startTime
+
+    # check work by searching for x button
+    pyautogui.move(50, 50)
+    try:
+        pyautogui.locateCenterOnScreen(mainScriptData["autoclickerImages"]["xButton"], confidence=.9, grayscale=True)
+        return False
+    except pyautogui.ImageNotFoundException:
+        print(f'\n<<<<<  Enabled ball texture in {round((endTime), 2)}s  (fast method)  >>>>>\n')
+        return True
+    
+def autoclickUsingImages(startTime):
+    global foundButtonCoords
+
+    # find and click 'disable safe mode' button
+    dsmCoords = clickImage(mainScriptData["autoclickerImages"]["disableSafeMode"])
+    pyautogui.sleep(.2)
+
+    # find and click cosmetics tab
+    # (using search region starting 175px above located 'disable safe mode' button, looking in a 150px region beneath)
+    cosmeticsTabCoords = clickImage(mainScriptData["autoclickerImages"]["cosmeticsTab"], confidence=0.8, region=(getRegion('cosmeticsTab', dsmCoords)))
+
+    # find and click ball texture dropdown
+    # (using search region starting 100px below located cosmetics tab, looking in a 250px region beneath)
+    dropdownCoords = clickImage(mainScriptData["autoclickerImages"]["ballTextureDropdown"], region=(getRegion('ballTextureDropdown', cosmeticsTabCoords)))
+
+    # find and click ball texture
+    # (using search region starting 15px below located dropdown menu (to avoid false positive in dropdown menu), looking in a 275px region beneath)
+    ballSelectionCoords = clickImage(mainScriptData["autoclickerImages"]["ballSelection"], region=(getRegion('ballSelection', dropdownCoords)))
+
+    # find and click 'x' button to exit
+    # (using search region starting 250px above located ball texture, looking in a 150px region beneath)
+    xButtonCoords = clickImage(mainScriptData["autoclickerImages"]["xButton"], region=(getRegion('xButton', ballSelectionCoords)))
+
+    foundButtonCoords = {
+        'disableSafeMode': dsmCoords,
+        'cosmeticsTab': cosmeticsTabCoords,
+        'ballTextureDropdown': dropdownCoords,
+        'ballSelection': ballSelectionCoords,
+        'xButton': xButtonCoords
+    }
+    print(f'\n<<<<<  Enabled ball texture in {round((time.perf_counter() - startTime), 2)}s  >>>>>\n')
+
+def enableBallTexture():
+    global foundButtonCoords
+    startTime = time.perf_counter()
+    pyautogui.sleep(.4)
+    pyautogui.move(50, 50)
+    try:
+        if foundButtonCoords:
+            success = autoclickUsingCoordList(foundButtonCoords, startTime)
+            if not success: 
+                cleanUpFailedAutoclickJob(startTime)
+                foundButtonCoords = None
+        else:
+            autoclickUsingImages(startTime)
+    except Exception as e:
+        print('Error:', e)
+
+
+# ------------------------------------------  chatting functions  -------------------------------------------------------------------------
+
+
+def speechToText():
+    try:
+        with mic as source:
+            print('speak now...\n')
+            audio = r.listen(source, timeout=5)
+    except sr.WaitTimeoutError:
+        print(' -- Listening timed out while waiting for phrase to start -- (you didnt speak within 5s, or your mic is muted)')
+        return None
+    startInterpretationTime = time.perf_counter()
+    response = {
+        "success": True,
+        "error": None,
+        "transcription": 'my speech recognition failed :(',
+        "interpretation time": None
+    }
+    try:
+        response["transcription"] = r.recognize_google(audio)
+        response["interpretation time"] = time.perf_counter() - startInterpretationTime
+        print(f'({round(response["interpretation time"], 2)}s interpretation)\n')
+    except sr.RequestError:
+        # API was unreachable or unresponsive
+        response["success"] = False
+        response["error"] = "API unavailable"
+        print(response)
+    except sr.UnknownValueError:
+        # speech was unintelligible
+        response["error"] = "Unable to recognize speech"
+        print(response)
+    except Exception as e:
+        print(e)
+    return response['transcription'].lower()
 
 def quickchat(thing: str, chatMode='lobby', spamCount=1, **effect):
     if not thing:
@@ -192,101 +320,9 @@ def quickchat(thing: str, chatMode='lobby', spamCount=1, **effect):
     except Exception as e:
         print(e)
 
-def speechToText():
-    try:
-        with mic as source:
-            print('speak now...\n')
-            audio = r.listen(source, timeout=5)
-    except sr.WaitTimeoutError:
-        print(' -- Listening timed out while waiting for phrase to start -- (you didnt speak within 5s, or your mic is muted)')
-        return None
-    startInterpretationTime = time.perf_counter()
-    response = {
-        "success": True,
-        "error": None,
-        "transcription": 'my speech recognition failed :(',
-        "interpretation time": None
-    }
-    try:
-        response["transcription"] = r.recognize_google(audio)
-        response["interpretation time"] = time.perf_counter() - startInterpretationTime
-        print(
-            f'({round(response["interpretation time"], 2)}s interpretation)\n')
-    except sr.RequestError:
-        # API was unreachable or unresponsive
-        response["success"] = False
-        response["error"] = "API unavailable"
-        print(response)
-    except sr.UnknownValueError:
-        # speech was unintelligible
-        response["error"] = "Unable to recognize speech"
-        print(response)
-    except Exception as e:
-        print(e)
-    return response['transcription'].lower()
 
-def clickThing(image, confidence=0.9, grayscale=True, region=None):
-    noRegion = not region
-    attempts = mainScriptData["autoclickAttemptsPerImage"]
-    lastResort = round(0.6 * attempts)      # last resort will kick in after 60% of attempts have failed
-    for i in range(attempts):
-        try:
-            imageCoords = pyautogui.locateCenterOnScreen(image, confidence=confidence, grayscale=grayscale) \
-                if (noRegion) else pyautogui.locateCenterOnScreen(image, confidence=confidence, grayscale=grayscale, region=region)
-            pyautogui.moveTo(imageCoords[0], imageCoords[1])
-            pyautogui.mouseDown()
-            time.sleep(.05)
-            pyautogui.mouseUp()
-            return imageCoords
-        except Exception as e:
-            print(e)
-            if (i >= lastResort and i < attempts - 1):
-                print(
-                    f'\n[attempt {i+1}] ... couldn\'t find "{image}" by searching entire screen (slower)')
-                noRegion = True
-            elif (i < lastResort and i < attempts - 1):
-                if noRegion:
-                    print(
-                        f'\n[attempt {i+1}] ... couldn\'t find "{image}" by searching entire screen (slower)')
-                else:
-                    print(
-                        f'\n[attempt {i+1}] ... couldn\'t find "{image}" in specified region')
-            else:
-                print(
-                    f'\n[attempt {i+1}] couldn\'t locate "{image}" on screen :(')
-                print(f'\nCheck this guide for a potential fix:\nhttps://github.com/smallest-cock/RL-Custom-Quickchat/#autoclicker-not-working-correctly\n')
+# ------------------------------------------  text effects  -------------------------------------------------------------------------------
 
-# auto click things in AlphaConsole menu to enable ball texture
-def enableBallTexture():
-    startTime = time.perf_counter()
-    time.sleep(.4)
-    pyautogui.move(50, 50)
-    try:
-        # find and click 'disable safe mode' button
-        disableSafeModeButtonCoords = clickThing(mainScriptData["autoclickerImages"]["disableSafeMode"])
-        time.sleep(.2)
-
-        # find and click cosmetics tab
-        # (start searching 175px above located 'disable safe mode' button, looking in a 150px region beneath)
-        cosmeticsTabCoords = clickThing(mainScriptData["autoclickerImages"]["cosmeticsTab"], confidence=0.8, region=(0, disableSafeModeButtonCoords[1] - 175, screenWidth, 150))
-
-        # find and click ball texture dropdown
-        # (start searching 100px below located cosmetics tab, looking in a 250px region beneath)
-        dropdownCoords = clickThing(mainScriptData["autoclickerImages"]["ballTextureDropdown"], region=(0, cosmeticsTabCoords[1] + 100, screenWidth, 250))
-
-        # find and click ball texture
-        # (start searching 15px below located dropdown menu (to avoid false positive in dropdown menu), looking in a 275px region beneath)
-        ballSelectionCoords = clickThing(mainScriptData["autoclickerImages"]["ballSelection"], region=(0, dropdownCoords[1] + 15, screenWidth, 275))
-
-        # find and click 'x' button to exit
-        # (start searching 250px above located ball texture, looking in a 150px region beneath)
-        clickThing(mainScriptData["autoclickerImages"]["xButton"], region=(0, ballSelectionCoords[1] - 250, screenWidth, 150))
-
-        print(f'\n<<<<<  Enabled ball texture in {round((time.perf_counter() - startTime), 2)}s  >>>>>\n')
-    except TypeError:
-        return
-    except Exception as e:
-        print('Error:', e)
 
 def sarcasticText(str: str):
     wordList = str.lower().split(' ')
@@ -316,8 +352,74 @@ def quotedAs(str: str, variationListName: str):
         return str
 
 
-# ----------------------------------- things to init on import --------------------------------------
+# ------------------------------------------  miscellaneous  ------------------------------------------------------------------------------
 
+
+def syncData(data: dict):
+    global mainScriptData
+    global shuffledVariations
+    mainScriptData = data.copy()
+    shuffledVariations = mainScriptData["variations"].copy()
+
+def macrosAreOn():
+    return macrosOn
+
+def shuffleVariations(key=''):
+    global shuffledVariations
+    if not (key == ''):
+        lastWordUsed = shuffledVariations[key]['randomizedList'][len(
+            mainScriptData["variations"][key]) - 1]
+        secondLastWordUsed = shuffledVariations[key]['randomizedList'][len(
+            mainScriptData["variations"][key]) - 2]
+        while True:
+            shuffledList = sample(mainScriptData["variations"][key], len(mainScriptData["variations"][key]))
+            if not (shuffledList[0] == lastWordUsed) and (shuffledList[1] == secondLastWordUsed):
+                shuffledVariations[key]['randomizedList'] = shuffledList
+                shuffledVariations[key]['nextUsableIndex'] = 0
+                break
+    else:
+        for key in mainScriptData["variations"]:
+            shuffledVariations[key] = {
+                'randomizedList': sample(mainScriptData["variations"][key], len(mainScriptData["variations"][key])),
+                'nextUsableIndex': 0
+            }
+
+def variation(variationListName: str):
+    global shuffledVariations
+    index = shuffledVariations[variationListName]['nextUsableIndex']
+    if not len(shuffledVariations[variationListName]['randomizedList']) > 2:
+        print(f'The "{variationListName}" variation list has less than 3 items..... it cannot be used properly!! Please add more items (words/phrases)')
+        return '-- "' + variationListName + '" variation list needs more items --'
+    else:
+        if index < (len(shuffledVariations[variationListName]['randomizedList'])):
+            randWord = shuffledVariations[variationListName]['randomizedList'][index]
+            shuffledVariations[variationListName]['nextUsableIndex'] += 1
+            return randWord
+        else:
+            shuffleVariations(variationListName)
+            randWord = shuffledVariations[variationListName]['randomizedList'][0]
+            shuffledVariations[variationListName]['nextUsableIndex'] += 1
+            return randWord
+
+
+# ------------------------------------------  stuff to init on import  --------------------------------------------------------------------
+
+
+# create global variables
+mainScriptData: dict = {}
+shuffledVariations: dict = {}
+
+controller = None
+numHatsOnController : int = 0
+pressedButtons : list = []
+macrosOn: bool = True
+
+foundButtonCoords: dict | None = None
+
+firstButtonPressed: dict = {
+    'button': None,
+    'time': 420
+}
 
 # pyautogui init
 screenWidth, screenHeight = pyautogui.size()

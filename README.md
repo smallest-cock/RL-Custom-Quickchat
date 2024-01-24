@@ -67,16 +67,12 @@ The supplied .png images were made using screenshots of a 1080p screen. If your 
 
 - Take your own screenshots and replace the supplied .png images
   - Make sure to crop them similarly and give them the same name
-- Find `functions.py` → `def enableBallTexture():` → `clickThing(...)` for whatever image isn't being found, and delete the `region=(...)` argument
+
+- Find `functions.py` → `def getRegion(...):` → "*whatever image isn't being found*", and edit the search region (the 4 values in parentheses)
+  - The structure is `(topLeftX, topLeftY, width, height)` where each value is a number (in pixels)
+  - Also update `checkWithinScreenBounds(topLeftY, height)` on the same line
+  - Make sure the new region is large enough to contain the whole .png image
   
-  ![gif_demo](https://github.com/smallest-cock/RL-Custom-Quickchat/assets/48503773/ba8bf2a7-edb1-472f-8275-5d610b75f3e4)
-
-  - This will make the autoclicker search the entire screen (rather than a specific region), which is slower but should give better chances at finding the image
-
-  - If you want a better (more performant) fix you can edit the `region=(...)` argument yourself, to search a specific region on your screen where you know the image will be.
-    - The structure is `region=(topLeftX, topLeftY, width, height)` where each value is a number (in pixels)
-    - A smaller region generally means a faster search, but make sure the region is large enough to contain the whole .png image
-
 #### If you get this error: `PyAutoGUI was unable to import pyscreeze ...`
 
 - Run this command: `pip install -U Pillow` to update the Pillow module to the latest version
