@@ -24,11 +24,11 @@ variations = {
 
 # PNG images for autoclicker
 autoclickerImages = {
-    "disableSafeMode": 'dsm.png',
-    "cosmeticsTab": 'cosmetics_tab.png',
-    "ballTextureDropdown": 'ball_texture_dropdown.png',
-    "ballSelection": 'ball_selection.png',
-    "xButton": 'x.png'
+    "disableSafeMode": 'autoclicker images/dsm.png',
+    "cosmeticsTab": 'autoclicker images/cosmetics_tab.png',
+    "ballTextureDropdown": 'autoclicker images/ball_texture_dropdown.png',
+    "ballSelection": 'autoclicker images/ball_selection.png',
+    "xButton": 'autoclicker images/x.png'
 }
 
 autoclickAttemptsPerImage = 20

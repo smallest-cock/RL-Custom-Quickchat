@@ -22,7 +22,7 @@ echo.
 
 :: get choice
 set pass=
-choice /c 1234 /n /m "Choose the type of script to install . . ."
+choice /c 1234 /n /m "Choose the type of script to install . . . "
 set pass=%errorlevel%
 
 :: set appropriate script name
@@ -33,18 +33,19 @@ if errorlevel 4 set scriptName="KBM_example.py"
 cls
 
 set desktopInstallationFolder="%USERPROFILE%\Desktop\Quickchats Script"
+set autoclickerImagesFolder="%USERPROFILE%\Desktop\Quickchats Script\autoclicker images"
 
 :: upgrade pip and install dependecies
 python.exe -m pip install --upgrade pip
 pip install -r requirements.txt
 
-:: create installation folder
+:: create destination folder (to avoid xcopy prompt)
 2> nul mkdir %desktopInstallationFolder%
 
-:: copy files to the folder
-xcopy /y /c "example scripts\%scriptName%" %desktopInstallationFolder%
-xcopy /y /c "example scripts\functions.py" %desktopInstallationFolder%
-xcopy /y /c "custom ball texture stuff\autoclicker images\*.png" %desktopInstallationFolder%
+:: copy everything to installation folder on desktop
+xcopy "example scripts\%scriptName%" %desktopInstallationFolder% /y /c
+xcopy "example scripts\functions.py" %desktopInstallationFolder% /y /c
+xcopy "custom ball texture stuff\autoclicker images\*.png" %autoclickerImagesFolder% /y /c /i
 
 cls
 echo.
