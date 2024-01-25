@@ -114,7 +114,7 @@ def resetFirstButtonPressed():
 # ------------------------------------------  autoclicker functions  ----------------------------------------------------------------------
 
 
-def clickImage(image, confidence=0.9, grayscale=True, region=None):
+def clickImage(image: str, confidence=0.9, grayscale=True, region=None):
     noRegion = not region
     attempts = mainScriptData["autoclickAttemptsPerImage"]
     lastResort = round(0.3 * attempts)      # last resort will kick in after 30% of attempts have failed
@@ -128,16 +128,17 @@ def clickImage(image, confidence=0.9, grayscale=True, region=None):
             return imageCoords
         except Exception as e:
             print(e)
+            imageName = image.split('/')[1]
             if (i >= lastResort and i < attempts - 1):
-                print(f'\n[attempt {i+1}] ... couldn\'t find "{image}" by searching entire screen (slower)')
+                print(f'\n[attempt {i+1}] ... couldn\'t find "{imageName}" by searching entire screen (slower)')
                 noRegion = True
             elif (i < lastResort and i < attempts - 1):
                 if noRegion:
-                    print(f'\n[attempt {i+1}] ... couldn\'t find "{image}" by searching entire screen (slower)')
+                    print(f'\n[attempt {i+1}] ... couldn\'t find "{imageName}" by searching entire screen (slower)')
                 else:
-                    print(f'\n[attempt {i+1}] ... couldn\'t find "{image}" in region {region}')
+                    print(f'\n[attempt {i+1}] ... couldn\'t find "{imageName}" in region {region}')
             else:
-                print(f'\n[attempt {i+1}] couldn\'t locate "{image}" on screen :(')
+                print(f'\n[attempt {i+1}] couldn\'t locate "{imageName}" on screen :(')
                 print(f'\nCheck this guide for a potential fix:\nhttps://github.com/smallest-cock/RL-Custom-Quickchat/#autoclicker-not-working-correctly\n')
         pyautogui.sleep(.1)
 
@@ -167,7 +168,7 @@ def findWhereAutoclickerLeftOff():
     }
     for key, val in mainScriptData["autoclickerImages"].items():
         try:
-            leftOff["coords"] = pyautogui.locateCenterOnScreen(val, confidence=.9, grayscale=True)
+            leftOff["coords"] = pyautogui.locateCenterOnScreen(val, confidence=.8, grayscale=True)
             leftOff["image"] = key
             break
         except Exception as e:
@@ -187,11 +188,12 @@ def cleanUpFailedAutoclickJob(startTime):
                 if shouldProceed:
                     if key == 'disableSafeMode' or not foundImageCoords:
                         foundImageCoords = clickImage(val)
+                        pyautogui.sleep(.2)
                     else:
-                        foundImageCoords = clickImage(val, region=getRegion(key, foundImageCoords))
+                        foundImageCoords = clickImage(val, confidence=.8, region=getRegion(key, foundImageCoords))
             except Exception as e:
                 print(e)
-    print(f'\n<<<<<  Enabled ball texture in {round((time.perf_counter() - startTime), 2)}s (fast method failed... position/size of AlphaConsole menu changed)  >>>>>\n')
+    print(f'\n<<<<<  Enabled ball texture in {round((time.perf_counter() - startTime), 2)}s  (fast method failed... probably bc position/size of AlphaConsole menu changed)  >>>>>\n')
 
 def autoclickUsingCoordList(foundButtonCoords: dict, startTime):
     for button, coords in foundButtonCoords.items():
@@ -202,14 +204,22 @@ def autoclickUsingCoordList(foundButtonCoords: dict, startTime):
             clickCoord(coords)
     endTime = time.perf_counter() - startTime
 
-    # check work by searching for x button
+
+    # check work by searching for x button on screen
     pyautogui.move(50, 50)
-    try:
-        pyautogui.locateCenterOnScreen(mainScriptData["autoclickerImages"]["xButton"], confidence=.9, grayscale=True)
+    xButtonFound = False
+    for i in range(2):      # 2 passes to weed out any chance of opencv error not finding xButton when it's actually there
+        try:
+            pyautogui.locateCenterOnScreen(mainScriptData["autoclickerImages"]["xButton"], confidence=.8, grayscale=True)
+            xButtonFound = True
+            break
+        except pyautogui.ImageNotFoundException:
+            pass
+        pyautogui.sleep(.1)
+    if xButtonFound:
         return False
-    except pyautogui.ImageNotFoundException:
-        print(f'\n<<<<<  Enabled ball texture in {round((endTime), 2)}s  (fast method)  >>>>>\n')
-        return True
+    print(f'\n<<<<<  Enabled ball texture in {round((endTime), 2)}s  (fast method)  >>>>>\n')
+    return True
     
 def autoclickUsingImages(startTime):
     global foundButtonCoords
