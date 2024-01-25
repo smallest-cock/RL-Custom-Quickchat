@@ -138,11 +138,16 @@ while True:
 
                 if macrosAreOn():
                     
-                    # on square + up + R1, types "let me cook"
-                    if combine('square', 'up', 'R1'):             # <--- you can now put any amount of buttons inside combine(...)
+                    # on square + up + R1, types "noice"
+                    if combine('square', 'up', 'R1'):   # <--- combine(...) can take any amount of buttons :)
+                        quickchat('noice')
+                        break
+
+                    # on up → left, types "let me cook"
+                    elif sequence('up', 'left'):    # <--- sequence(...) can only take 2 buttons!
                         quickchat('let me cook')
                         break
-                
+
                     # on square + left, types "dont lose this kickoff" (spamming 2 times)
                     elif combine('square', 'left'):
                         quickchat('dont lose this kickoff', spamCount=2)  # <-- the '2' is how many times the chat will be spammed.. the max you can put is 3 (before RL gives a chat timeout)
@@ -158,8 +163,8 @@ while True:
                         quickchat('im lagging', chatMode='team', spamCount=3)
                         break
                     
-                    # on up → left, types "im gay" (using party chat)
-                    elif sequence('up', 'left'):
+                    # on up → right, types "im gay" (using party chat)
+                    elif sequence('up', 'right'):
                         quickchat('im gay', chatMode='party')
                         break
 

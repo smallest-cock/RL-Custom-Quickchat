@@ -122,10 +122,15 @@ while True:
                 if macrosAreOn():
 
                     # on square + up + R1, types "noice"
-                    if combine('square', 'up', 'R1'):           # <--- you can now put any amount of buttons inside combine(...)
+                    if combine('square', 'up', 'R1'):   # <--- combine(...) can take any amount of buttons :)
                         quickchat('noice')
                         break
                     
+                    # on up → left, types "let me cook"
+                    elif sequence('up', 'left'):    # <--- sequence(...) can only take 2 buttons!
+                        quickchat('let me cook')
+                        break
+
                     # on square + left, types "dont lose this kickoff" (spamming 2 times)
                     elif combine('square', 'left'):
                         quickchat('dont lose this kickoff', spamCount=2)  # <-- the '2' is how many times the chat will be spammed.. the max you can put is 3 (before RL gives a chat timeout)
@@ -136,22 +141,17 @@ while True:
                         quickchat('tell me how you really feel...', chatMode='team')
                         break
                     
-                    # on X + right, types "im lagging" (using team chat, spamming 3 times)
+                    # on x → circle, types "im lagging" (using team chat, spamming 3 times)
                     elif sequence('x', 'circle'):
                         quickchat('im lagging', chatMode='team', spamCount=3)
                         break
-
-                    # on up → right, types "let me cook"
-                    elif sequence('up', 'left'):
-                        quickchat('let me cook')
-                        break
                     
-                    # on up → left, types "im gay" (using party chat)
+                    # on left → left, types "im gay" (using party chat)
                     elif sequence('left', 'left'):
                         quickchat('im gay', chatMode='party')
                         break
 
-                    # on left → left, types "Word variations are [compliment]!"  ..... where [compliment] is a random word from the 'compliment' variations list above
+                    # on down → left, types "Word variations are [compliment]!"  ..... where [compliment] is a random word from the 'compliment' variations list above
                     elif sequence('down', 'left'):
                         quickchat(f'Word variations are {variation("compliment")}!')    # <-- One way to include word variations in your chats (notice the 'f' at the beginning of the string)
                         break
