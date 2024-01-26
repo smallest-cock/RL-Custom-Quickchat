@@ -28,6 +28,7 @@ def combine(*buttons):
     for button in buttons:
         if not (button in pressedButtons):
             return False
+    resetFirstButtonPressed()
     return True
 
 # determine if a button sequence has been pressed ... limited to a 2 button sequence at the moment
