@@ -75,6 +75,13 @@ The supplied .png images were made using screenshots of a 1080p screen. If your 
     - Also update `checkWithinScreenBounds(topLeftY, height)` on the same line
     - Make sure the new region is large enough to contain the whole .png image
   
+#### If "fast mode" fails
+
+This usually happens when you change the position or size of the AlphaConsole settings window (causing previous mouse click positions to no longer be valid). If you didn't touch the AlphaConsole settings window and you still see this message, you can just disable "fast mode" altogether to avoid issues:
+
+- At the top of your script, change the value of `enableAutoclickerFastMode` to `False`
+- Alternatively, you can create a macro which triggers the function `toggleFastMode()`. This will give you the ability to toggle fast mode at any time without having to edit/restart your script
+
 #### If you get this error: `PyAutoGUI was unable to import pyscreeze ...`
 
 - Run this command: `pip install -U Pillow` to update the Pillow module to the latest version

@@ -114,6 +114,9 @@ def resetFirstButtonPressed():
 
 # ------------------------------------------  autoclicker functions  ----------------------------------------------------------------------
 
+def toggleFastMode():
+    mainScriptData['enableAutoclickerFastMode'] = not mainScriptData['enableAutoclickerFastMode']
+    print(f'-------- autoclicker fast mode toggled {"on" if mainScriptData['enableAutoclickerFastMode'] else "off"} --------\n')
 
 def clickImage(image: str, confidence=0.9, grayscale=True, region=None):
     noRegion = not region
@@ -194,7 +197,7 @@ def cleanUpFailedAutoclickJob(startTime):
                         foundImageCoords = clickImage(val, confidence=.8, region=getRegion(key, foundImageCoords))
             except Exception as e:
                 print(e)
-    print(f'\n<<<<<  Enabled ball texture in {round((time.perf_counter() - startTime), 2)}s  (fast method failed... probably bc position/size of AlphaConsole menu changed)  >>>>>\n')
+    print(f'\n<<<<<  Enabled ball texture in {round((time.perf_counter() - startTime), 2)}s  (fast mode failed... probably bc position/size of AlphaConsole menu changed)  >>>>>\n')
 
 def autoclickUsingCoordList(foundButtonCoords: dict, startTime):
     for button, coords in foundButtonCoords.items():
@@ -219,7 +222,7 @@ def autoclickUsingCoordList(foundButtonCoords: dict, startTime):
         pyautogui.sleep(.1)
     if xButtonFound:
         return False
-    print(f'\n<<<<<  Enabled ball texture in {round((endTime), 2)}s  (fast method)  >>>>>\n')
+    print(f'\n<<<<<  Enabled ball texture in {round((endTime), 2)}s  (fast mode)  >>>>>\n')
     return True
     
 def autoclickUsingImages(startTime):
@@ -260,7 +263,7 @@ def enableBallTexture():
     pyautogui.sleep(.4)
     pyautogui.move(50, 50)
     try:
-        if foundButtonCoords:
+        if foundButtonCoords and mainScriptData['enableAutoclickerFastMode']:
             success = autoclickUsingCoordList(foundButtonCoords, startTime)
             if not success: 
                 cleanUpFailedAutoclickJob(startTime)

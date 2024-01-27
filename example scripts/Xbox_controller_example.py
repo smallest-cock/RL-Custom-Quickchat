@@ -31,6 +31,7 @@ autoclickerImages = {
     "xButton": 'autoclicker images/x.png'
 }
 
+enableAutoclickerFastMode = True
 autoclickAttemptsPerImage = 20
 
 # Adjusts chat typing speed (seconds per character) ...
@@ -75,6 +76,7 @@ data = {
     "chatSpamInterval": chatSpamInterval,
     "timeWindow": macroTimeWindow,
     "autoclickerImages": autoclickerImages,
+    "enableAutoclickerFastMode": enableAutoclickerFastMode,
     "autoclickAttemptsPerImage": autoclickAttemptsPerImage,
     "buttons": buttons,
     "chatKeys": chatKeys
@@ -177,9 +179,8 @@ while True:
                         quickchat(speechToText(), chatMode='team')
                         break
 
-                    # autoclick things in AlphaConsole menu to enable ball texture
                     elif combine('y', 'left'):
-                        enableBallTexture()
+                        enableBallTexture()     # <--- autoclick things in AlphaConsole menu to enable ball texture
                         break
 
 
