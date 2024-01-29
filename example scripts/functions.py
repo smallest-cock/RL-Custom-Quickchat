@@ -6,6 +6,8 @@ import speech_recognition as sr
 
 
 
+speechToTextEnabled = True
+
 # ------------------------------------------  KBM specific  -------------------------------------------------------------------------------
     
 
@@ -278,36 +280,39 @@ def enableBallTexture():
 
 
 def speechToText():
-    try:
-        with mic as source:
-            print('speak now...\n')
-            audio = r.listen(source, timeout=5)
-    except sr.WaitTimeoutError:
-        print(' -- Listening timed out while waiting for phrase to start -- (you didnt speak within 5s, or your mic is muted)')
-        return None
-    startInterpretationTime = time.perf_counter()
-    response = {
-        "success": True,
-        "error": None,
-        "transcription": 'my speech recognition failed :(',
-        "interpretation time": None
-    }
-    try:
-        response["transcription"] = r.recognize_google(audio)
-        response["interpretation time"] = time.perf_counter() - startInterpretationTime
-        print(f'({round(response["interpretation time"], 2)}s interpretation)\n')
-    except sr.RequestError:
-        # API was unreachable or unresponsive
-        response["success"] = False
-        response["error"] = "API unavailable"
-        print(response)
-    except sr.UnknownValueError:
-        # speech was unintelligible
-        response["error"] = "Unable to recognize speech"
-        print(response)
-    except Exception as e:
-        print(e)
-    return response['transcription'].lower()
+    if speechToTextEnabled:
+        try:
+            with mic as source:
+                print('speak now...\n')
+                audio = r.listen(source, timeout=5)
+        except sr.WaitTimeoutError:
+            print(' -- Listening timed out while waiting for phrase to start -- (you didnt speak within 5s, or your mic is muted)')
+            return None
+        startInterpretationTime = time.perf_counter()
+        response = {
+            "success": True,
+            "error": None,
+            "transcription": 'my speech recognition failed :(',
+            "interpretation time": None
+        }
+        try:
+            response["transcription"] = r.recognize_google(audio)
+            response["interpretation time"] = time.perf_counter() - startInterpretationTime
+            print(f'({round(response["interpretation time"], 2)}s interpretation)\n')
+        except sr.RequestError:
+            # API was unreachable or unresponsive
+            response["success"] = False
+            response["error"] = "API unavailable"
+            print(response)
+        except sr.UnknownValueError:
+            # speech was unintelligible
+            response["error"] = "Unable to recognize speech"
+            print(response)
+        except Exception as e:
+            print(e)
+        return response['transcription'].lower()
+    else:
+        print("*** Speech-to-text is disabled ***\n")
 
 def quickchat(thing: str, chatMode='lobby', spamCount=1, **effect):
     if not thing:
@@ -440,8 +445,16 @@ screenWidth, screenHeight = pyautogui.size()
 pyautogui.FAILSAFE = False
 
 # speech recognition init
-print('\nadjusting mic sensitivity for ambient noise ...\n')
-r = sr.Recognizer()
-mic = sr.Microphone()
-with mic as source:
-    r.adjust_for_ambient_noise(source)
+if speechToTextEnabled:
+    try:
+        print('\nadjusting mic sensitivity for ambient noise ...\n')
+        r = sr.Recognizer()
+        mic = sr.Microphone()
+        with mic as source:
+            r.adjust_for_ambient_noise(source)
+    except OSError:
+        print("No mic detected! Speech-to-text will be disabled.\n")
+        speechToTextEnabled = False
+    except Exception as e:
+        print(e)
+        speechToTextEnabled = False
