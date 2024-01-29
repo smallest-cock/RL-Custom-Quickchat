@@ -43,9 +43,11 @@ https://youtu.be/qdeey4lyZo0
    - If you encounter any errors, try running as Administrator 
    - If you want to rename the example .py file, do it before step 3
 
-3. Store `Quickchats Script` wherever you want on your PC → Open it → Right-click the example script → Create shortcut
+3. Store the `Quickchats Script` folder wherever you want on your PC → Open it → Right-click the example script → Create shortcut
 
-4. Right-click the shortcut → Properties → Target: → add the word "python" to the beginning, so it looks like: `python "C:\Users\....."`. Click Apply.
+4. Right-click the shortcut → Properties → Target: → add the word `python` to the beginning, with a space, so it looks like: `python "C:\Users\....."`. Click Apply.
+   - Even better, you can add `cmd /k python` instead of just `python` to have the terminal window stay open, even if the script exits/crashes
+     - This will allow you to easily read any error messages related to a crash
    - You can also change Run: → Minimized to have it start minimized
 
 5. Leave the script running any time you want to use it :)
