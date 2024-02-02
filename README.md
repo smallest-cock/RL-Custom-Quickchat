@@ -70,8 +70,8 @@ The supplied .png images were made using screenshots of a 1080p screen. If your 
 - Take your own screenshots and replace the supplied .png images
   - Make sure to crop them similarly and give them the same name
 
-- In `functions.py` find `def getRegion(...):` → `match "whatever image isn't being found":` → `return ...` and edit or delete the search region (the 4 values in parentheses)
-  - Editing the region will make it search a different part of the screen, deleting the region will make it search the *entire* screen
+- In `functions.py` find `def getRegion(...):` → `match "whateverImageIsntBeingFound":` → `return ...` and edit or delete the search region (the 4 values in parentheses)
+  - Editing the region will make it search a different part of the screen; deleting the region will make it search the *entire* screen
   - To delete the region: change the whole line to `return None`
   - To edit the region: the structure is `(topLeftX, topLeftY, width, height)` where each value is a number (in pixels)
     - Also update `checkWithinScreenBounds(topLeftY, height)` on the same line

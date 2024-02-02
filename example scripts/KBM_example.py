@@ -31,9 +31,12 @@ autoclickerImages = {
     "xButton": 'autoclicker images/x.png'
 }
 
+speechToTextEnabled = True
+
+enableAutoclickerFastMode = True
 autoclickAttemptsPerImage = 20
 
-# Adjusts chat typing speed (seconds per character) ...
+# Adjusts chat typing speed (seconds per character)
 typingDelay = .002          # 0 makes chats type out instantly (but will cut off long chats)
                             # .001 will allow long chats (but occasionally goes too fast for RL, causing typos)
                             # .002 seems to be slow enough for the RL chat box to reliably keep up (no typos)
@@ -48,19 +51,13 @@ chatKeys = {
     'party': 'u'
 }
 
-# --------------------------------------------------------------------------------------------------------
 
-data = {
-    "variations": variations,
-    "typingDelay": typingDelay,
-    "chatSpamInterval": chatSpamInterval,
-    "autoclickerImages": autoclickerImages,
-    "autoclickAttemptsPerImage": autoclickAttemptsPerImage,
-    "chatKeys": chatKeys
-}
+# ----------------------------------  only touch this stuff if you know what you're doing  -----------------------------------------
 
-syncData(data)
-shuffleVariations()
+autoclicker = Autoclicker(autoclickerImages, enableAutoclickerFastMode, autoclickAttemptsPerImage)
+chat = Chat(chatKeys, typingDelay, chatSpamInterval, speechToTextEnabled, variations)
+chat.shuffleVariations()
+syncData(autoclicker, chat)
 
 # change working directory to script directory (so .png files are easily located)
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
@@ -79,7 +76,8 @@ while True:
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~    Edit the code below to change quickchats, macros, spam amounts, chat modes, variations, etc.    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-      # ------------  Testing these macros via the terminal may cause the script to exit prematurely (due to auto typing), but wont happen if another app is in focus  ---------------
+
+        # -------  Testing these macros via the terminal may cause the script to exit prematurely (due to auto typing), but wont happen if another app is in focus  -------
        
 
         toggleKbmMacros('home')

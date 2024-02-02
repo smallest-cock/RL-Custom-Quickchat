@@ -6,7 +6,7 @@ joysticks = [pygame.joystick.Joystick(i) for i in range(pygame.joystick.get_coun
 
 for controller in joysticks:
     if controller.get_init():
-        print(f"\n\n~~~~~~ {controller.get_name()} detected ~~~~~~\n\npress a button to get the input value....\n\n")
+        print(f"\n\n~~~~~~ {controller.get_name()} detected ~~~~~~\n\npress a button to get its value....\n\n")
 
 while True:
     try:
