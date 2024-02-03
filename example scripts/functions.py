@@ -249,7 +249,7 @@ class Autoclicker:
     def autoclickUsingCoords(self, startTime: float) -> bool:
         for button, coords in self.foundButtonCoords.items():
             if button == 'disableSafeMode':
-                self.clickCoord(coords)
+                self.clickCoord(coords, clickDuration=.1)
                 pyautogui.sleep(.3)
             else:
                 self.clickCoord(coords)
@@ -301,7 +301,7 @@ class Autoclicker:
                     print(e)
         print(f'\n<<<<<  Enabled ball texture in {round((time.perf_counter() - startTime), 2)}s  (fast mode failed... probably bc position/size of AlphaConsole menu changed)  >>>>>\n')
     
-    def clickImage(self, image: str, confidence: float = 0.9, grayscale: bool = True, region=None):
+    def clickImage(self, image: str, confidence: float = 0.9, grayscale: bool = True, region=None, clickDuration=None):
         noRegion = not region
         lastResort = round(0.3 * self.attemptsPerImage)      # last resort will kick in after 30% of attempts have failed
         for i in range(self.attemptsPerImage):
@@ -309,7 +309,8 @@ class Autoclicker:
                 imageCoords = pyautogui.locateCenterOnScreen(image, confidence=confidence, grayscale=grayscale) \
                     if (noRegion) else pyautogui.locateCenterOnScreen(image, confidence=confidence, grayscale=grayscale, region=region)
                 pyautogui.mouseDown(imageCoords[0], imageCoords[1])
-                # pyautogui.sleep(.05)      # uncomment this line if autoclicker clicks dont register correctly
+                if clickDuration:
+                    pyautogui.sleep(clickDuration)
                 pyautogui.mouseUp()
                 return imageCoords
             except Exception as e:
@@ -328,8 +329,10 @@ class Autoclicker:
                     print(f'\nCheck this guide for a potential fix:\nhttps://github.com/smallest-cock/RL-Custom-Quickchat/#autoclicker-not-working-correctly\n')
             pyautogui.sleep(.1)
     
-    def clickCoord(self, coordTuple):
+    def clickCoord(self, coordTuple, clickDuration=None):
         pyautogui.mouseDown(coordTuple[0], coordTuple[1])
+        if clickDuration:
+            pyautogui.sleep(clickDuration)
         pyautogui.mouseUp()
 
     def getRegion(self, image, prevImageCoords):
