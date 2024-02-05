@@ -32,6 +32,9 @@ autoclickerImages = {
 
 speechToTextEnabled = True
 
+# Your 'Lobby Info' folder path... created when you install the 'Lobby Info' bakkesmod plugin .dll here: https://github.com/smallest-cock/LobbyInfo/releases/tag/latest
+lobbyInfoFolderPath = r'C:\Users\<your user account name here>\AppData\Roaming\bakkesmod\bakkesmod\data\Lobby Info'
+
 enableAutoclickerFastMode = True
 autoclickAttemptsPerImage = 20
 
@@ -76,11 +79,12 @@ buttons = {
 
 # ----------------------------------  only touch this stuff if you know what you're doing  -----------------------------------------
 
+lobbyInfo = LobbyInfo(lobbyInfoFolderPath)
 controller = Controller(buttons, macroTimeWindow)
 autoclicker = Autoclicker(autoclickerImages, enableAutoclickerFastMode, autoclickAttemptsPerImage)
 chat = Chat(chatKeys, typingDelay, chatSpamInterval, speechToTextEnabled, variations)
 chat.shuffleVariations()
-syncData(autoclicker, chat, controller)
+syncData(autoclicker, lobbyInfo, chat, controller)
 
 # change working directory to script directory (so .png files are easily located)
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
@@ -163,6 +167,26 @@ while True:
                 
                 elif combine('triangle', 'left'):
                     enableBallTexture()     # <--- autoclick things in AlphaConsole menu to enable ball texture
+                    continue
+                
+                # expose the last chatter's ranks
+                elif combine('touchpad'):
+                    quickchat(blastRanks())
+                    continue
+                
+                # expose last chatter's 2v2 rank and # of games played this season
+                elif sequence('right', 'right'):
+                    quickchat(blastRank('2v2'))     # <----- can also use '1v1', '3v3' or 'casual'
+                    continue
+                
+                # repeat the last chat aS sArCAsM tExT
+                elif sequence('right', 'down'):
+                    quickchat(lastChat(), sarcasm=True)
+                    continue
+                
+                # repeat the last chat "as a quote" - sweaty gamer
+                elif sequence('right', 'up'):
+                    quickchat(lastChat(), quotedAs='sweaty gamer')
                     continue
 
 

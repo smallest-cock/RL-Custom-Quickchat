@@ -33,6 +33,9 @@ autoclickerImages = {
 
 speechToTextEnabled = True
 
+# Your 'Lobby Info' folder path... created when you install the 'Lobby Info' bakkesmod plugin .dll here: https://github.com/smallest-cock/LobbyInfo/releases/tag/latest
+lobbyInfoFolderPath = r'C:\Users\<your user account name here>\AppData\Roaming\bakkesmod\bakkesmod\data\Lobby Info'
+
 enableAutoclickerFastMode = True
 autoclickAttemptsPerImage = 20
 
@@ -54,10 +57,11 @@ chatKeys = {
 
 # ----------------------------------  only touch this stuff if you know what you're doing  -----------------------------------------
 
+lobbyInfo = LobbyInfo(lobbyInfoFolderPath)
 autoclicker = Autoclicker(autoclickerImages, enableAutoclickerFastMode, autoclickAttemptsPerImage)
 chat = Chat(chatKeys, typingDelay, chatSpamInterval, speechToTextEnabled, variations)
 chat.shuffleVariations()
-syncData(autoclicker, chat)
+syncData(autoclicker, lobbyInfo, chat)
 
 # change working directory to script directory (so .png files are easily located)
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
@@ -124,11 +128,30 @@ while True:
                 quickchat(speechToText(), chatMode='team')
                 continue
 
-            # autoclick things in AlphaConsole menu to enable ball texture
             elif press('pageup'):
-                enableBallTexture()
+                enableBallTexture()         # <--- autoclick things in AlphaConsole menu to enable ball texture
                 continue
-        
+            
+            # expose the last chatter's ranks
+            elif press('insert'):
+                quickchat(blastRanks())
+                continue
+            
+            # expose last chatter's 2v2 rank and # of games played this season
+            elif press('alt+down'):
+                quickchat(blastRank('2v2'))     # <----- can also use '1v1', '3v3' or 'casual'
+                continue
+            
+            # repeat the last chat aS sArCAsM tExT
+            elif press('backspace'):
+                quickchat(lastChat(), sarcasm=True)
+                continue
+            
+            # repeat the last chat "as a quote" - sweaty gamer
+            elif press('k+7'):
+                quickchat(lastChat(), quotedAs='sweaty gamer')
+                continue
+
 
     except Exception as e:
         print(e)

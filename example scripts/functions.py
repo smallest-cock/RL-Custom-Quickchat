@@ -4,6 +4,7 @@ import pyautogui
 from random import sample
 import speech_recognition as sr
 import pygame
+import json
 
 
 
@@ -31,6 +32,15 @@ def speechToText() -> str | None:
 def enableBallTexture():
     autoclickerObj.enableBallTexture()
 
+def lastChat() -> str | None:
+    return lobbyInfoObj.lastChat()
+
+def blastRanks() -> str | None :
+    return lobbyInfoObj.blastRanks()
+
+def blastRank(playlist: str) -> str | None:
+    return lobbyInfoObj.blastRank(playlist)
+
 def toggleFastMode():
     autoclickerObj.toggleFastMode()
 
@@ -39,13 +49,15 @@ def toggleFastMode():
 
 controllerObj = None
 autoclickerObj = None
+lobbyInfoObj = None
 chatObj = None
 
-def syncData(autoclicker, chat, controller=None):
-    global controllerObj, autoclickerObj, chatObj
+def syncData(autoclicker, lobbyInfo, chat, controller=None):
+    global controllerObj, autoclickerObj, lobbyInfoObj, chatObj
     if controller:
         controllerObj = controller
     autoclickerObj = autoclicker
+    lobbyInfoObj = lobbyInfo
     chatObj = chat
 
 
@@ -352,6 +364,92 @@ class Autoclicker:
         self.fastModeEnabled = not self.fastModeEnabled
         print(f'-------- autoclicker fast mode toggled {"on" if self.fastModeEnabled else "off"} --------\n')
            
+
+
+# ------------------------------------------  LobbyInfo class  ---------------------------------------------------------------------------- 
+
+
+class LobbyInfo():
+    def __init__(self, folderPath: str) -> None:
+        self.chatsJsonFile = folderPath + r"\Chats.json"
+        self.ranksJsonFile = folderPath + r"\Ranks.json"
+
+    def lastChat(self) -> str | None:
+        try:
+            with open(self.chatsJsonFile, encoding='utf8') as f:
+                jsonData = json.load(f)
+                return jsonData["chatMessages"][-1]["chat"]
+        except IndexError:
+            print(f"JSON file at '{self.chatsJsonFile}' has no chats ...")
+        except Exception as e:
+            print(e)
+
+    def findLastChatterRanks(self) -> dict | None:
+        try:
+            # get last chatter name
+            lastChatterName = None
+            with open(self.chatsJsonFile, encoding='utf8') as f:
+                jsonData = json.load(f)
+                lastChatterName = jsonData["chatMessages"][-1]["playerName"]
+        except IndexError:
+            print(f"JSON file at '{self.chatsJsonFile}' has no chats ...")
+            return
+        except Exception as e:
+            print(e)
+            return
+        try:
+            # get last chatter ranks based on name
+            lastChattersRanks = { 'name': lastChatterName }
+            with open(self.ranksJsonFile, encoding='utf8') as g:
+                jsonData = json.load(g)
+                lastChattersRanks['ranks'] = jsonData['lobbyRanks'][lastChatterName]
+        except KeyError:
+            print(f"{lastChatterName} wasn't found in '{self.ranksJsonFile}'")
+            return
+        except Exception as e:
+            print(e)
+            return
+        return lastChattersRanks
+
+    def blastRanks(self) -> str | None:
+        ranksDict = self.findLastChatterRanks()
+        if not ranksDict:
+            return
+
+        # filter out playlists that haven't been played this season
+        def getRankStr(rankDictForPlaylist: dict):
+            matchesPlayed = rankDictForPlaylist['matches']
+            tier = rankDictForPlaylist['rank']['tier']
+            div = rankDictForPlaylist['rank']['div']
+            if (matchesPlayed == 0) or (tier == 'n/a') or (div == 'n/a'):
+                return '--'
+            return f'{tier}..div{div}'
+    
+        return (f'''{ranksDict["name"]}: [1s] {getRankStr(ranksDict["ranks"]["1v1"])} \
+[2s] {getRankStr(ranksDict["ranks"]["2v2"])} \
+[3s] {getRankStr(ranksDict["ranks"]["3v3"])}''')
+
+    def blastRank(self, playlist: str) -> str | None:
+        ranksDict = self.findLastChatterRanks()      
+        if not ranksDict:
+            return
+        try:
+            matches = ranksDict['ranks'][playlist]['matches']
+            if playlist != 'casual':
+                tier = ranksDict['ranks'][playlist]['rank']['tier']
+                div = ranksDict['ranks'][playlist]['rank']['div']
+                if (tier != 'n/a') and (div != 'n/a'):
+                    if matches != 0:
+                        return f'{ranksDict["name"]} [{playlist}] ** {tier} div{div} ** ({matches} matches)'
+                    else:
+                        return f'{ranksDict["name"]} [{playlist}] ** {tier} div{div} ** (prev season MMR)'
+                else:
+                    return f'{ranksDict["name"]} [{playlist}] ** doesnt play ** ({matches} matches)'
+            else:
+                return f'{ranksDict["name"]} [{playlist}] ** {matches} matches played **'
+        except Exception as e:
+            print("blastRank error:", e)
+
 
 
 # ------------------------------------------  Chat class  --------------------------------------------------------------------------------- 
