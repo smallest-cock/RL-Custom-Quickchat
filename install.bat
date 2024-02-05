@@ -35,6 +35,9 @@ cls
 set desktopInstallationFolder="%USERPROFILE%\Desktop\Quickchats Script"
 set autoclickerImagesFolder="%USERPROFILE%\Desktop\Quickchats Script\autoclicker images"
 
+:: change current working directory to the repo folder (for when running as admin)
+cd %~dp0
+
 :: upgrade pip and install dependecies
 python.exe -m pip install --upgrade pip
 pip install -r requirements.txt
