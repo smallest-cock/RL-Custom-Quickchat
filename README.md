@@ -17,6 +17,8 @@ https://youtu.be/G0Lperc-UU0
   - [Video tutorial](https://youtu.be/qjvJxKlpNx0)
 - Speech-to-text chats
   - [Video demo](https://youtu.be/cqEdJQ-X7X4)
+- Expose people's ranks in chat *\*\**
+- Parrot people's chats (with optional added effects, such as sArCAsM tExT or "as a quote" - something) *\*\**
 - KBM version
 - Create button combination macros (Circle + Up) or button sequence macros (Left → Down)
   - Button combo macros will work with any amount of buttons (e.g. L1 + Up + Square + R1)
@@ -27,6 +29,10 @@ https://youtu.be/G0Lperc-UU0
   - "thx [friend]" .... where [friend] is a random word like "homie", "blud", "bro", "my guy", etc.
   - Easily customize with word lists
 - Toggle all macros on/off with one press of a button
+   
+<br>
+
+*\*\** Requires the [Lobby Info bakkesmod plugin](https://github.com/smallest-cock/LobbyInfo/releases/tag/latest) 
 
 ## How to install:
 
