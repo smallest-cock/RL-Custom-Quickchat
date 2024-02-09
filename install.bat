@@ -42,18 +42,38 @@ cd %~dp0
 python.exe -m pip install --upgrade pip
 pip install -r requirements.txt
 
-:: create destination folder (to avoid xcopy prompt)
+:: create folders for installation
 2> nul mkdir %desktopInstallationFolder%
+2>nul mkdir %autoclickerImagesFolder%
 
 :: copy everything to installation folder on desktop
-xcopy "example scripts\%scriptName%" %desktopInstallationFolder% /y /c
-xcopy "example scripts\functions.py" %desktopInstallationFolder% /y /c
-xcopy "custom ball texture stuff\autoclicker images\*.png" %autoclickerImagesFolder% /y /c /i
+copy /v /y "example scripts\%scriptName%" %desktopInstallationFolder%
+copy /v /y "example scripts\functions.py" %desktopInstallationFolder%
+copy /v /y "custom ball texture stuff\autoclicker images\*.png" %autoclickerImagesFolder%
 
 cls
-echo.
-echo.
-echo.   Setup complete! Press any key to exit.
-echo.
-echo.
-timeout /t 10 >nul 2>&1
+
+:: display appropriate exit message
+if %errorlevel% equ 0 (
+    echo.
+    echo.
+    echo.   Setup complete! Press any key to exit.
+    echo.
+    echo.
+    timeout /t 10 >nul 2>&1
+) else (
+    echo.
+    echo.
+    echo.   An error occured during installation!
+    echo.   
+    echo.   ... maybe try running as administrator?
+    echo.   
+    echo.   
+    echo.   
+    echo.   
+    echo.   
+    echo.   Press any key to exit.
+    echo.
+    echo.
+    timeout /t 10 >nul 2>&1
+)
