@@ -10,4 +10,4 @@ https://drive.google.com/file/d/1_15gdd_4Rtd2TdIxZFZyDDNBWFTOv7LL
 1. Uninstall your current version of AlphaConsole (if you already have it)
     - Intructions to remove a plugin: https://bakkesmod.fandom.com/wiki/Troubleshooting#Removing_Plugins
   
-2. Drag/drop the ACPlugin.dll (older version) into your bakkesmod plugins folder
+2. Drag/drop the `ACPlugin.dll` (older version) into your bakkesmod plugins folder
