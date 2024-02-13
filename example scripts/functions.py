@@ -5,6 +5,7 @@ from random import sample
 import speech_recognition as sr
 import pygame
 import json
+import cv2
 
 
 
@@ -204,162 +205,230 @@ class Controller:
 
 
 class Autoclicker:
-    def __init__(self, images: dict, fastMode: bool = True, attempts: int = 20) -> None:
-        self.images = images
-        self.fastModeEnabled = fastMode
+
+    class Image:
+        def __init__(self, name, path) -> None:
+            self.name = name
+            self.path = path
+            img = cv2.imread(path, cv2.IMREAD_UNCHANGED)
+            height, width, channels = img.shape
+            self.height = height
+            self.width = width
+            self.searchRegion = None
+            self.lastFoundCoords = None
+
+
+    def __init__(self, images: dict, fastModeEnabled: bool = True, attempts: int = 20) -> None:
+        self.images = {}
+        self.fastMode = False
+        self.fastModeEnabled = fastModeEnabled
         self.attemptsPerImage = attempts
-        self.foundButtonCoords = {}
         self.screenWidth, self.screenHeight = pyautogui.size()
         pyautogui.FAILSAFE = False
         pyautogui.MINIMUM_DURATION = 0
+        for imgName, imgPath in images.items():
+            self.images[imgName] = self.Image(imgName, imgPath)
+            
 
     def enableBallTexture(self):
         startTime = time.perf_counter()
         pyautogui.sleep(.4)
         pyautogui.move(50, 50)
         try:
-            if self.foundButtonCoords and self.fastModeEnabled:
-                success = self.autoclickUsingCoords(startTime)
+            if self.fastModeEnabled and self.fastMode:
+                success = self.autoclickFastMode(startTime)
                 if not success: 
+                    print('\nfast mode failed :(')
+                    self.clearLocatedImageData()
                     self.cleanUpFailedJob(startTime)
-                    self.foundButtonCoords = {}
             else:
-                self.autoclickUsingImages(startTime)
+                self.autoclickRegular(startTime)
         except Exception as e:
             print('Error:', e)
 
-    def autoclickUsingImages(self, startTime: float):
+        # to prevent RL from getting stuck in KBM input mode, which lowers FPS (left clicking mouse seems to get it unstuck for some reason?)
+        pyautogui.move(10, 10)
+        pyautogui.leftClick(duration=.1)
 
+
+    def autoclickRegular(self, startTime: float):
         # find and click 'disable safe mode' button
-        dsmCoords = self.clickImage(self.images["disableSafeMode"])
+        dsmCoords = self.clickImage(self.images['disableSafeMode'].path, region=self.getSearchRegion('disableSafeMode'))
         pyautogui.sleep(.2)
 
         # find and click cosmetics tab
-        # (using search region starting 175px above located 'disable safe mode' button, looking in a 150px region beneath)
-        cosmeticsTabCoords = self.clickImage(self.images["cosmeticsTab"], confidence=0.8, region=(self.getRegion('cosmeticsTab', dsmCoords)))
+        cosmeticsTabCoords = self.clickImage(self.images['cosmeticsTab'].path, confidence=0.8, region=self.getSearchRegion('cosmeticsTab', dsmCoords))
 
         # find and click ball texture dropdown
-        # (using search region starting 100px below located cosmetics tab, looking in a 250px region beneath)
-        dropdownCoords = self.clickImage(self.images["ballTextureDropdown"], region=(self.getRegion('ballTextureDropdown', cosmeticsTabCoords)))
+        dropdownCoords = self.clickImage(self.images['ballTextureDropdown'].path, region=self.getSearchRegion('ballTextureDropdown', cosmeticsTabCoords))
 
         # find and click ball texture
-        # (using search region starting 15px below located dropdown menu (to avoid false positive in dropdown menu), looking in a 275px region beneath)
-        ballSelectionCoords = self.clickImage(self.images["ballSelection"], region=(self.getRegion('ballSelection', dropdownCoords)))
+        ballSelectionCoords = self.clickImage(self.images['ballSelection'].path, grayscale=False, region=self.getSearchRegion('ballSelection', dropdownCoords))
 
         # find and click 'x' button to exit
-        # (using search region starting 250px above located ball texture, looking in a 150px region beneath)
-        xButtonCoords = self.clickImage(self.images["xButton"], region=(self.getRegion('xButton', ballSelectionCoords)))
+        xButtonCoords = self.clickImage(self.images['xButton'].path, region=self.getSearchRegion('xButton', ballSelectionCoords))
 
-        self.foundButtonCoords['disableSafeMode'] = dsmCoords
-        self.foundButtonCoords['cosmeticsTab'] = cosmeticsTabCoords
-        self.foundButtonCoords['ballTextureDropdown'] = dropdownCoords
-        self.foundButtonCoords['ballSelection'] = ballSelectionCoords
-        self.foundButtonCoords['xButton'] = xButtonCoords
+        # save button coordinates
+        self.images['disableSafeMode'].lastFoundCoords = dsmCoords
+        self.images['cosmeticsTab'].lastFoundCoords = cosmeticsTabCoords
+        self.images['ballTextureDropdown'].lastFoundCoords = dropdownCoords
+        self.images['ballSelection'].lastFoundCoords = ballSelectionCoords
+        self.images['xButton'].lastFoundCoords = xButtonCoords
 
+        self.fineTuneSearchRegions()
+        self.fastMode = True
         print(f'\n<<<<<  Enabled ball texture in {round((time.perf_counter() - startTime), 2)}s  >>>>>\n')
+    
 
-    def autoclickUsingCoords(self, startTime: float) -> bool:
-        for button, coords in self.foundButtonCoords.items():
-            if button == 'disableSafeMode':
-                self.clickCoord(coords, clickDuration=.1)
-                pyautogui.sleep(.3)
-            else:
-                self.clickCoord(coords)
+    def autoclickFastMode(self, startTime: float) -> bool:
+        self.clickImage(self.images['disableSafeMode'].path, region=self.getSearchRegion('disableSafeMode'))
+        pyautogui.sleep(.2)
+        self.clickCoord(self.images['cosmeticsTab'].lastFoundCoords)
+        self.clickCoord(self.images['ballTextureDropdown'].lastFoundCoords)
+        self.clickCoord(self.images['ballSelection'].lastFoundCoords)
+        self.clickCoord(self.images['xButton'].lastFoundCoords)
         endTime = time.perf_counter() - startTime
 
-        # check work by searching for x button on screen
+        # check work by searching for first and last buttons on screen (disable safe mode & x)
         pyautogui.move(50, 50)
-        xButtonFound = False
-        for i in range(2):      # 2 passes to weed out any chance of opencv error not finding xButton when it's actually there
-            try:
-                pyautogui.locateCenterOnScreen(self.images["xButton"], confidence=.8, grayscale=True)
-                xButtonFound = True
-                break
-            except pyautogui.ImageNotFoundException:
-                pass
-            pyautogui.sleep(.1)
-        if xButtonFound:
+        if self.searchForImage(self.images['disableSafeMode'].path):
             return False
+        for _ in range(2):      # 2 passes to weed out any chance of opencv error of not finding xButton when it's actually there
+            xButtonOnScreen = self.searchForImage(self.images['xButton'].path)
+            if xButtonOnScreen:
+                return False
+            pyautogui.sleep(.1)
+
         print(f'\n<<<<<  Enabled ball texture in {round((endTime), 2)}s  (fast mode)  >>>>>\n')
         return True
+
+
+    def getSearchRegion(self, imageName, prevImageCoords=None):
+        if self.images[imageName].searchRegion:
+            return self.images[imageName].searchRegion
+        else:
+            if prevImageCoords:
+                return self.getRelativeSearchRegion(imageName, prevImageCoords)
+            else: 
+                return None
+
+
+    def fineTuneSearchRegions(self):
+        for img in self.images.values():
+            if img.lastFoundCoords:
+                img.searchRegion = self.checkWithinScreenBounds((img.lastFoundCoords[0] - img.width, img.lastFoundCoords[1] - img.height, img.width * 2, img.height * 2))
+
+
+    def clearLocatedImageData(self):
+        self.fastMode = False
+        for img in self.images.values():
+            img.lastFoundCoords = None
+            img.searchRegion = None
+
     
-    # finish failed autoclick job using reliable image search method
     def cleanUpFailedJob(self, startTime: float):
         leftOff =  {
             "image": None,
             "coords": None
         }
-        for key, val in self.images.items():
+        for imageName, imageObj in self.images.items():
             try:
-                leftOff["coords"] = pyautogui.locateCenterOnScreen(val, confidence=.8, grayscale=True)
-                leftOff["image"] = key
+                leftOff["coords"] = pyautogui.locateCenterOnScreen(imageObj.path, confidence=.9, grayscale=True)
+                leftOff["image"] = imageName
                 break
-            except Exception as e:
-                print(e)
+            except pyautogui.ImageNotFoundException:
+                pass
         shouldProceed = False
         foundImageCoords = leftOff["coords"]
         if foundImageCoords:
-            for key, val in self.images.items():
-                if key == leftOff["image"]:
+            for imageName, imageObj in self.images.items():
+                if imageName == leftOff["image"]:
                     shouldProceed = True
                 try:
                     if shouldProceed:
-                        if key == 'disableSafeMode' or not foundImageCoords:
-                            foundImageCoords = self.clickImage(val)
+                        if imageName == 'disableSafeMode' or not foundImageCoords:
+                            foundImageCoords = self.clickImage(imageObj.path)
                             pyautogui.sleep(.2)
                         else:
-                            foundImageCoords = self.clickImage(val, confidence=.8, region=self.getRegion(key, foundImageCoords))
+                            foundImageCoords = self.clickImage(imageObj.path)
                 except Exception as e:
                     print(e)
         print(f'\n<<<<<  Enabled ball texture in {round((time.perf_counter() - startTime), 2)}s  (fast mode failed... probably bc position/size of AlphaConsole menu changed)  >>>>>\n')
+        print(f'(if you didn\'t touch the AlphaConole menu, consider changing \'enableAutoclickerFastMode\' to False in your script to avoid future issues)\n')
     
+
+    # checks if image is on found screen... if yes, returns Point tuple.. if not, returns False
+    def searchForImage(self, image, confidence=.8, grayscale=True, region=None):
+        try:
+            point = pyautogui.locateCenterOnScreen(image, confidence=confidence, grayscale=grayscale, region=region)
+            return point
+        except pyautogui.ImageNotFoundException:
+            return False
+
+
     def clickImage(self, image: str, confidence: float = 0.9, grayscale: bool = True, region=None, clickDuration=None):
-        noRegion = not region
-        lastResort = round(0.3 * self.attemptsPerImage)      # last resort will kick in after 30% of attempts have failed
+        lastResort = round(0.1 * self.attemptsPerImage)     # last resort will kick in after 10% of attempts have failed
         for i in range(self.attemptsPerImage):
+            attempt = i + 1
             try:
-                imageCoords = pyautogui.locateCenterOnScreen(image, confidence=confidence, grayscale=grayscale) \
-                    if (noRegion) else pyautogui.locateCenterOnScreen(image, confidence=confidence, grayscale=grayscale, region=region)
+                imageCoords = pyautogui.locateCenterOnScreen(image, confidence=confidence, grayscale=grayscale, region=region)
                 pyautogui.mouseDown(imageCoords[0], imageCoords[1])
                 if clickDuration:
                     pyautogui.sleep(clickDuration)
                 pyautogui.mouseUp()
                 return imageCoords
+            except pyautogui.ImageNotFoundException:
+                imageName = image.split('/')[1]     # used specifically for image file paths declared in main script ... this line should change if those filepaths change
+                if (attempt < lastResort and attempt < self.attemptsPerImage):    # if last resort isn't active
+                    if not region:
+                        print(f'\n[attempt {attempt}] ... couldn\'t find "{imageName}" by searching entire screen (slower)')
+                    else:
+                        print(f'\n[attempt {attempt}] ... couldn\'t find "{imageName}" in region {region}')
+                elif (attempt == lastResort and attempt < self.attemptsPerImage):     # if should activate last resort (disable region)
+                    if not region:
+                        print(f'\n[attempt {attempt}] ... couldn\'t find "{imageName}" by searching entire screen (slower)')
+                    else:
+                        print(f'\n[attempt {attempt}] ... couldn\'t find "{imageName}" in region {region}')
+                        region = None
+                elif (attempt > lastResort and attempt < self.attemptsPerImage):    # if last resort is active
+                    print(f'\n[attempt {attempt}] ... couldn\'t find "{imageName}" by searching entire screen (slower)')
+                else:       # after last attempt
+                    print(f'\n[attempt {attempt}] couldn\'t locate "{imageName}" on screen :(')
+                    print(f'\nCheck this guide for a potential fix:\nhttps://github.com/smallest-cock/RL-Custom-Quickchat/blob/main/Troubleshooting.md\n')
             except Exception as e:
                 print(e)
-                imageName = image.split('/')[1]     # used specifically for image file paths declared in main script ... this line should change if those filepaths change
-                if (i >= lastResort and i < self.attemptsPerImage - 1):
-                    print(f'\n[attempt {i+1}] ... couldn\'t find "{imageName}" by searching entire screen (slower)')
-                    noRegion = True
-                elif (i < lastResort and i < self.attemptsPerImage - 1):
-                    if noRegion:
-                        print(f'\n[attempt {i+1}] ... couldn\'t find "{imageName}" by searching entire screen (slower)')
-                    else:
-                        print(f'\n[attempt {i+1}] ... couldn\'t find "{imageName}" in region {region}')
-                else:
-                    print(f'\n[attempt {i+1}] couldn\'t locate "{imageName}" on screen :(')
-                    print(f'\nCheck this guide for a potential fix:\nhttps://github.com/smallest-cock/RL-Custom-Quickchat/#autoclicker-not-working-correctly\n')
             pyautogui.sleep(.1)
     
+
     def clickCoord(self, coordTuple, clickDuration=None):
         pyautogui.mouseDown(coordTuple[0], coordTuple[1])
         if clickDuration:
             pyautogui.sleep(clickDuration)
         pyautogui.mouseUp()
 
-    def getRegion(self, image, prevImageCoords):
-        def checkWithinScreenBounds(top, height):
-            return ((top >= 0) and (top <= self.screenHeight)) and ((top + height >= 0) and (top + height <= self.screenHeight))
+
+    def getRelativeSearchRegion(self, image, prevImageCoords):
         match image:
             case 'cosmeticsTab':
-                return (0, prevImageCoords[1] - 175, self.screenWidth, 150) if checkWithinScreenBounds(prevImageCoords[1] - 175, 150) else None
+                region = (0, prevImageCoords[1] - 175, self.screenWidth, 150)
+                return region if self.checkWithinScreenBounds(region) else None
             case 'ballTextureDropdown':
-                return (0, prevImageCoords[1] + 100, self.screenWidth, 250) if checkWithinScreenBounds(prevImageCoords[1] + 100, 250) else None
+                region = (0, prevImageCoords[1] + 100, self.screenWidth, 250)
+                return region if self.checkWithinScreenBounds(region) else None
             case 'ballSelection':
-                return (0, prevImageCoords[1] + 15, self.screenWidth, 275) if checkWithinScreenBounds(prevImageCoords[1] + 15, 275) else None
+                region = (0, prevImageCoords[1] + 15, self.screenWidth, 275)
+                return region if self.checkWithinScreenBounds(region) else None
             case 'xButton':
-                return (0, prevImageCoords[1] - 250, self.screenWidth, 150) if checkWithinScreenBounds(prevImageCoords[1] - 250, 150) else None
-            
+                region = (0, prevImageCoords[1] - 250, self.screenWidth, 150)
+                return region if self.checkWithinScreenBounds(region) else None
+
+
+    def checkWithinScreenBounds(self, regionTuple):     # <--- regionTuple has the format: (topLeftX, topLeftY, width, height)
+            xValid = ((regionTuple[0] >= 0) and (regionTuple[0] <= self.screenWidth)) and ((regionTuple[0] + regionTuple[2] >= 0) and (regionTuple[0] + regionTuple[2] <= self.screenWidth))
+            yValid = ((regionTuple[1] >= 0) and (regionTuple[1] <= self.screenHeight)) and ((regionTuple[1] + regionTuple[3] >= 0) and (regionTuple[1] + regionTuple[3] <= self.screenHeight))
+            return regionTuple if xValid and yValid else None
+                
+
     def toggleFastMode(self):
         self.fastModeEnabled = not self.fastModeEnabled
         print(f'-------- autoclicker fast mode toggled {"on" if self.fastModeEnabled else "off"} --------\n')
