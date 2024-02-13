@@ -57,14 +57,14 @@ chatKeys = {
 
 # ----------------------------------  only touch this stuff if you know what you're doing  -----------------------------------------
 
+# change working directory to script directory (so .png files are easily located)
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
+
 lobbyInfo = LobbyInfo(lobbyInfoFolderPath)
 autoclicker = Autoclicker(autoclickerImages, enableAutoclickerFastMode, autoclickAttemptsPerImage)
 chat = Chat(chatKeys, typingDelay, chatSpamInterval, speechToTextEnabled, variations)
 chat.shuffleVariations()
 syncData(autoclicker, lobbyInfo, chat)
-
-# change working directory to script directory (so .png files are easily located)
-os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 print(f"\n\n~~~~~~~~~~~~~~ KBM version ~~~~~~~~~~~~~~\n\nwaiting for quickchat inputs....\n\n")
 

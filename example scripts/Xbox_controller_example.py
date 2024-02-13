@@ -77,15 +77,15 @@ buttons = {
 
 # ----------------------------------  only touch this stuff if you know what you're doing  -----------------------------------------
 
+# change working directory to script directory (so .png files are easily located)
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
+
 lobbyInfo = LobbyInfo(lobbyInfoFolderPath)
 controller = Controller(buttons, macroTimeWindow)
 autoclicker = Autoclicker(autoclickerImages, enableAutoclickerFastMode, autoclickAttemptsPerImage)
 chat = Chat(chatKeys, typingDelay, chatSpamInterval, speechToTextEnabled, variations)
 chat.shuffleVariations()
 syncData(autoclicker, lobbyInfo, chat, controller)
-
-# change working directory to script directory (so .png files are easily located)
-os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 while True:
     try:
