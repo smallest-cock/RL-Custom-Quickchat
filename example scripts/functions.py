@@ -328,34 +328,30 @@ class Autoclicker:
 
     
     def cleanUpFailedJob(self, startTime: float):
-        leftOff =  {
-            "image": None,
-            "coords": None
-        }
+        foundImage = self.findWhereLeftOff()
+        if foundImage:
+            clickedCoords = None
+            for imageName, imageObj in self.images.items():
+                if (imageName == foundImage["name"]) or clickedCoords:
+                    try:
+                        clickedCoords = self.clickImage(imageObj.path)
+                        if imageName == 'disableSafeMode':
+                            pyautogui.sleep(.2)
+                    except Exception as e:
+                        print(e)
+            print(f'\n<<<<<  Enabled ball texture in {round((time.perf_counter() - startTime), 2)}s  (fast mode failed... probably bc position/size of AlphaConsole menu changed)  >>>>>\n')
+            print('(if you didn\'t touch the AlphaConole menu, consider changing \'enableAutoclickerFastMode\' to False in your script to avoid future issues)\n')
+        else:
+            print("\nAutoclicker didn\'t finish successfully :(\n")
+    
+    def findWhereLeftOff(self):
         for imageName, imageObj in self.images.items():
             try:
-                leftOff["coords"] = pyautogui.locateCenterOnScreen(imageObj.path, confidence=.9, grayscale=True)
-                leftOff["image"] = imageName
-                break
+                coords = pyautogui.locateCenterOnScreen(imageObj.path, confidence=.9, grayscale=True)
+                return {"coords": coords, "name": imageName}
             except pyautogui.ImageNotFoundException:
-                pass
-        shouldProceed = False
-        foundImageCoords = leftOff["coords"]
-        if foundImageCoords:
-            for imageName, imageObj in self.images.items():
-                if imageName == leftOff["image"]:
-                    shouldProceed = True
-                try:
-                    if shouldProceed:
-                        if imageName == 'disableSafeMode' or not foundImageCoords:
-                            foundImageCoords = self.clickImage(imageObj.path)
-                            pyautogui.sleep(.2)
-                        else:
-                            foundImageCoords = self.clickImage(imageObj.path)
-                except Exception as e:
-                    print(e)
-            print(f'\n<<<<<  Enabled ball texture in {round((time.perf_counter() - startTime), 2)}s  (fast mode failed... probably bc position/size of AlphaConsole menu changed)  >>>>>\n')
-            print(f'(if you didn\'t touch the AlphaConole menu, consider changing \'enableAutoclickerFastMode\' to False in your script to avoid future issues)\n')
+                continue
+        return None
     
 
     # checks if image is on found screen... if yes, returns Point tuple.. if not, returns False
