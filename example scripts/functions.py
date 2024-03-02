@@ -30,8 +30,8 @@ def variation(variationListName: str) -> str:
 def speechToText() -> str | None:
     return chatObj.speechToText()
 
-def enableBallTexture():
-    autoclickerObj.enableBallTexture()
+def enableBallTexture(onlyUseCoordsForFastMode=False, startDelay=.4, fastModeStartDelay=.4, delayAfterDSM=.3, delayBetweenClicks=0.0, clickDuration=0.0, startFromImage=0, enableCleanup=True):
+    autoclickerObj.enableBallTexture(onlyUseCoordsForFastMode=onlyUseCoordsForFastMode, startDelay=startDelay, fastModeStartDelay=fastModeStartDelay, dsmDelay=delayAfterDSM, delayBetweenClicks=delayBetweenClicks, clickDuration=clickDuration, startFromImage=startFromImage, enableCleanup=enableCleanup)
 
 def lastChat() -> str | None:
     return lobbyInfoObj.lastChat()
@@ -246,19 +246,27 @@ class Autoclicker:
         self.images.sort(key=lambda elm: elm.index)
 
 
-    def enableBallTexture(self):
+    def enableBallTexture(self, onlyUseCoordsForFastMode=False, startDelay=.4, fastModeStartDelay=.4, dsmDelay=.3, delayBetweenClicks=0, clickDuration=0, startFromImage=0, enableCleanup=True):
         startTime = time.perf_counter()
-        pyautogui.sleep(.4)
+        pyautogui.sleep(fastModeStartDelay if self.fastMode else startDelay)
         pyautogui.move(50, 50)
         try:
-            if self.fastModeEnabled and self.fastMode:
-                success = self.autoclickFastMode(startTime)
-                if not success: 
-                    print('\nfast mode failed :(')
-                    self.clearLocatedImageData()
-                    self.cleanUpFailedJob(startTime)
+            if startFromImage > 1 and self.fastMode:
+                if startFromImage > len(self.images):
+                    print(f'Error: The given image index {startFromImage} is too high... there are only {len(self.images)} images')
+                    return
+                success = self.clickCoordsStartingFromIndex(startFromImage - 1, startTime, clickDuration, delayBetweenClicks, dsmDelay)
+                if not success:
+                    print(f'\nAutoclicker failed when trying to start from image {self.images[startFromImage].name} ')
+                    self.handleCleanup(enableCleanup, startTime)
             else:
-                self.autoclickRegular(startTime)
+                if self.fastModeEnabled and self.fastMode:
+                    success = self.autoclickFastMode(startTime, onlyUseCoordsForFastMode, dsmDelay, clickDuration, delayBetweenClicks)
+                    if not success: 
+                        print('\nfast mode failed :(')
+                        self.handleCleanup(enableCleanup, startTime)
+                else:
+                    self.autoclickRegular(startTime, dsmDelay, clickDuration, delayBetweenClicks)
         except Exception as e:
             print('Error:', e)
 
@@ -267,15 +275,17 @@ class Autoclicker:
         pyautogui.leftClick(duration=.1)
 
 
-    def autoclickRegular(self, startTime: float):
+    def autoclickRegular(self, startTime: float, dsmDelay: float, clickDuration: float, delayBetweenClicks: float):
         clickedCoords = []
-        for image in self.images:
+        for index, image in enumerate(self.images):
             searchArgs = self.getImageSearchArgs(image, clickedCoords[image.index - 1] if clickedCoords else None)
-            clickedCoord = self.clickImage(*searchArgs)
+            clickedCoord = self.clickImage(*searchArgs, clickDuration=clickDuration)
             if clickedCoord:
                 clickedCoords.append(clickedCoord)
                 if image.name == "disableSafeMode":
-                    pyautogui.sleep(.2)
+                    pyautogui.sleep(dsmDelay - 0.1 if (dsmDelay - 0.1) > 0 else dsmDelay)
+                if delayBetweenClicks and index < 4:
+                    pyautogui.sleep(delayBetweenClicks)
             else: return
 
         # save found image coordinates
@@ -287,26 +297,45 @@ class Autoclicker:
         print(f'\n<<<<<  Enabled ball texture in {round((time.perf_counter() - startTime), 2)}s  >>>>>\n')
     
 
-    def autoclickFastMode(self, startTime: float) -> bool:
-        dsmButtonClicked = self.clickImage(*self.getImageSearchArgs(self.images[0]))
-        if dsmButtonClicked:
-            pyautogui.sleep(.2)
-            for i in range(1, 5):
-                self.clickCoord(self.images[i].lastFoundCoords)
-            endTime = time.perf_counter() - startTime
+    def autoclickFastMode(self, startTime: float, shouldOnlyUseCoords: bool, dsmDelay: float, clickDuration: float, delayBetweenClicks: float) -> bool:
+        if shouldOnlyUseCoords:
+            return self.clickCoordsStartingFromIndex(0, startTime, clickDuration, delayBetweenClicks, dsmDelay)
+        else:
+            dsmButtonClicked = self.clickImage(*self.getImageSearchArgs(self.images[0]), clickDuration=clickDuration)
+            if dsmButtonClicked:
+                pyautogui.sleep(dsmDelay - 0.1 if (dsmDelay - 0.1) > 0 else dsmDelay)
+                if delayBetweenClicks:
+                    pyautogui.sleep(delayBetweenClicks)
+                return self.clickCoordsStartingFromIndex(1, startTime, clickDuration, delayBetweenClicks, dsmDelay)
+        return False
 
-            # check work by searching for first and last buttons on screen (disable safe mode & x)
-            pyautogui.move(50, 50)
-            if self.searchForImage(self.images[0].path):
+
+    def clickCoordsStartingFromIndex(self, imgListIndex, startTime, clickDuration, delayBetweenClicks, dsmDelay) -> bool:
+        for i in range(imgListIndex, 5):
+            if self.images[i].lastFoundCoords:
+                self.clickCoord(self.images[i].lastFoundCoords, clickDuration=clickDuration)
+                if i == 0:
+                    pyautogui.sleep(dsmDelay)
+                if delayBetweenClicks and i < 4:
+                    pyautogui.sleep(delayBetweenClicks)
+            else:
+                print(f'\nError: {self.images[i].name} has no saved coordinates')
+                print('\n... make sure to run enableBallTexture() at least once to get all image coordinates')
                 return False
-            for _ in range(2):      # 2 passes to weed out any chance of opencv error of not finding xButton when it's actually there
-                xButtonOnScreen = self.searchForImage(self.images[4].path)
-                if xButtonOnScreen:
-                    return False
-                pyautogui.sleep(.1)
+        endTime = time.perf_counter() - startTime
 
-            print(f'\n<<<<<  Enabled ball texture in {round((endTime), 2)}s  (fast mode)  >>>>>\n')
-            return True
+        # check work by searching for first and last buttons on screen (disable safe mode & x)
+        pyautogui.move(50, 50)
+        if self.searchForImage(self.images[0].path):
+            return False
+        for _ in range(2):      # 2 passes to weed out any chance of opencv error of not finding xButton when it's actually there
+            xButtonOnScreen = self.searchForImage(self.images[4].path)
+            if xButtonOnScreen:
+                return False
+            pyautogui.sleep(.1)
+
+        print(f'\n<<<<<  Enabled ball texture in {round((endTime), 2)}s  (fast mode)  >>>>>\n')
+        return True
 
 
     def cleanUpFailedJob(self, startTime: float):
@@ -326,7 +355,7 @@ class Autoclicker:
             except pyautogui.ImageNotFoundException:
                 continue
         return None
-
+    
     def clickRemainingButtons(self, leftOffImage) -> bool:
         if leftOffImage:
             clickedCoords = None
@@ -385,6 +414,12 @@ class Autoclicker:
                 img.searchRegion = self.checkWithinScreenBounds((img.lastFoundCoords[0] - img.width, img.lastFoundCoords[1] - img.height, img.width * 2, img.height * 2))
 
 
+    def handleCleanup(self, shouldCleanup: bool, startTime):
+        if shouldCleanup:
+            self.clearLocatedImageData()
+            self.cleanUpFailedJob(startTime)
+
+
     def clearLocatedImageData(self):
         self.fastMode = False
         for img in self.images:
@@ -400,7 +435,7 @@ class Autoclicker:
             return False
 
 
-    def clickImage(self, image: str, confidence: float = 0.9, grayscale: bool = True, region=None, clickDuration=None):
+    def clickImage(self, image: str, confidence: float = 0.9, grayscale: bool = True, region=None, clickDuration=0):
         lastResort = round(0.1 * self.attemptsPerImage)     # last resort will kick in after 10% of attempts have failed
         for i in range(self.attemptsPerImage):
             attempt = i + 1

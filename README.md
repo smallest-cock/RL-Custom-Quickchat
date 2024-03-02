@@ -59,9 +59,11 @@ https://youtu.be/qdeey4lyZo0
 5. Leave the script running any time you want to use it :)
    - Edit the example script to customize quick chats, macros, etc.
 
-## 🔍 Troubleshooting / Errors:
+## 🔍 Info / Troubleshooting / Errors:
 
-See [troubleshooting page](/Troubleshooting.md) for common errors and fixes
+- See the [troubleshooting page](./docs/Troubleshooting.md) for common errors and fixes
+
+- [Autoclicker usage guide](./docs/Autoclicker.md) — info about how the autoclicker works and how to customize it
 
 ## 🙏 Support
 
