@@ -463,7 +463,7 @@ class Autoclicker:
                     print(f'\n[attempt {attempt}] ... couldn\'t find "{imageName}" by searching entire screen (slower)')
                 else:       # after last attempt
                     print(f'\n[attempt {attempt}] couldn\'t locate "{imageName}" on screen :(')
-                    print(f'\nCheck this guide for a potential fix:\nhttps://github.com/smallest-cock/RL-Custom-Quickchat/blob/main/Troubleshooting.md\n')
+                    print(f'\nCheck this guide for a potential fix:\nhttps://github.com/smallest-cock/RL-Custom-Quickchat/blob/main/docs/Troubleshooting.md\n')
             except Exception as e:
                 print(e)
             pyautogui.sleep(.1)
