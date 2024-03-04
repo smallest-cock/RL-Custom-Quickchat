@@ -31,7 +31,7 @@ def speechToText() -> str | None:
     return chatObj.speechToText()
 
 def enableBallTexture(onlyUseCoordsForFastMode=False, startDelay=.4, fastModeStartDelay=.4, delayAfterDSM=.3, delayBetweenClicks=0.0, clickDuration=0.0, startFromImage=0, enableCleanup=True):
-    autoclickerObj.enableBallTexture(onlyUseCoordsForFastMode=onlyUseCoordsForFastMode, startDelay=startDelay, fastModeStartDelay=fastModeStartDelay, dsmDelay=delayAfterDSM, delayBetweenClicks=delayBetweenClicks, clickDuration=clickDuration, startFromImage=startFromImage, enableCleanup=enableCleanup)
+    autoclickerObj.enableBallTexture(onlyUseCoordsForFastMode=onlyUseCoordsForFastMode, startDelay=startDelay, fastModeStartDelay=fastModeStartDelay, delayAfterDSM=delayAfterDSM, delayBetweenClicks=delayBetweenClicks, clickDuration=clickDuration, startFromImage=startFromImage, enableCleanup=enableCleanup)
 
 def lastChat() -> str | None:
     return lobbyInfoObj.lastChat()
@@ -246,7 +246,7 @@ class Autoclicker:
         self.images.sort(key=lambda elm: elm.index)
 
 
-    def enableBallTexture(self, onlyUseCoordsForFastMode=False, startDelay=.4, fastModeStartDelay=.4, dsmDelay=.3, delayBetweenClicks=0, clickDuration=0, startFromImage=0, enableCleanup=True):
+    def enableBallTexture(self, onlyUseCoordsForFastMode=False, startDelay=.4, fastModeStartDelay=.4, delayAfterDSM=.3, delayBetweenClicks=0, clickDuration=0, startFromImage=0, enableCleanup=True):
         startTime = time.perf_counter()
         pyautogui.sleep(fastModeStartDelay if self.fastMode else startDelay)
         pyautogui.move(50, 50)
@@ -255,18 +255,18 @@ class Autoclicker:
                 if startFromImage > len(self.images):
                     print(f'Error: The given image index {startFromImage} is too high... there are only {len(self.images)} images')
                     return
-                success = self.clickCoordsStartingFromIndex(startFromImage - 1, startTime, clickDuration, delayBetweenClicks, dsmDelay)
+                success = self.clickCoordsStartingFromIndex(startFromImage - 1, startTime, clickDuration, delayBetweenClicks, delayAfterDSM)
                 if not success:
                     print(f'\nAutoclicker failed when trying to start from image {self.images[startFromImage].name} ')
                     self.handleCleanup(enableCleanup, startTime)
             else:
                 if self.fastModeEnabled and self.fastMode:
-                    success = self.autoclickFastMode(startTime, onlyUseCoordsForFastMode, dsmDelay, clickDuration, delayBetweenClicks)
+                    success = self.autoclickFastMode(startTime, onlyUseCoordsForFastMode, delayAfterDSM, clickDuration, delayBetweenClicks)
                     if not success: 
                         print('\nfast mode failed :(')
                         self.handleCleanup(enableCleanup, startTime)
                 else:
-                    self.autoclickRegular(startTime, dsmDelay, clickDuration, delayBetweenClicks)
+                    self.autoclickRegular(startTime, delayAfterDSM, clickDuration, delayBetweenClicks)
         except Exception as e:
             print('Error:', e)
 
