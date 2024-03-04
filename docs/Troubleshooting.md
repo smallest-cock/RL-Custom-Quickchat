@@ -1,5 +1,9 @@
 ## Autoclicker not working correctly
 
+>[!IMPORTANT]
+>See [Autoclicker Usage](./Autoclicker.md) for info about how the autoclicker works (and how to customize it)
+
+
 ### If you have multiple displays:
 
 - Make sure RL is running on the **primary** monitor
