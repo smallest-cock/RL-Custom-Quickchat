@@ -167,7 +167,7 @@ while True:
                 
                 elif combine('triangle', 'left'):
                     enableBallTexture()     # <--- autoclick things in AlphaConsole menu to enable ball texture
-                    continue
+                    continue                # to customize the autoclicker see https://github.com/smallest-cock/RL-Custom-Quickchat/blob/main/docs/Autoclicker.md#optional-arguments 
                 
 
     # --------  to use the features below: install the 'Lobby Info' bakkesmod plugin (see above) & edit 'lobbyInfoFolderPath' appropriately (see above)  ---------
