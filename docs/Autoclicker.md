@@ -16,7 +16,8 @@ When `enableBallTexture()` is called without any arguments, the default behaviou
 
     - At the end of each "fast mode" run, success (or failure) is determined by searching the screen for the 1st and last images, to make sure they're not present
     
-    - Warning: "fast mode" will fail if you move/resize the AlphaConsole menu between runs (because the screen coordinates for the images/buttons will change)
+      >[!WARNING]
+      >"fast mode" will fail if you move/resize the AlphaConsole menu between runs, because the screen coordinates for the images/buttons will change
   
   - If `enableFastMode` is set to `False` in your script, the behavior will be the same as the 1st run. Images will be searched for, and clicked if found
     - Previously clicked button coordinates will be used to fine-tune the image search regions, to make image searching faster
