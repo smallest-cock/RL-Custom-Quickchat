@@ -64,7 +64,7 @@ lobbyInfo = LobbyInfo(lobbyInfoFolderPath)
 autoclicker = Autoclicker(autoclickerImages, enableAutoclickerFastMode, autoclickAttemptsPerImage)
 chat = Chat(chatKeys, typingDelay, chatSpamInterval, speechToTextEnabled, variations)
 chat.shuffleVariations()
-syncData(autoclicker, lobbyInfo, chat)
+syncData(autoclicker=autoclicker, lobbyInfo=lobbyInfo, chat=chat)
 
 print(f"\n\n~~~~~~~~~~~~~~ KBM version ~~~~~~~~~~~~~~\n\nwaiting for quickchat inputs....\n\n")
 

@@ -104,7 +104,7 @@ controller = Controller(buttons, macroTimeWindow)
 autoclicker = Autoclicker(autoclickerImages, enableAutoclickerFastMode, autoclickAttemptsPerImage)
 chat = Chat(chatKeys, typingDelay, chatSpamInterval, speechToTextEnabled, variations)
 chat.shuffleVariations()
-syncData(autoclicker, lobbyInfo, chat, controller)
+syncData(autoclicker=autoclicker, lobbyInfo=lobbyInfo, chat=chat, controller=controller)
 
 while True:
     try:

@@ -53,10 +53,9 @@ autoclickerObj = None
 lobbyInfoObj = None
 chatObj = None
 
-def syncData(autoclicker, lobbyInfo, chat, controller=None):
+def syncData(autoclicker=None, lobbyInfo=None, chat=None, controller=None):
     global controllerObj, autoclickerObj, lobbyInfoObj, chatObj
-    if controller:
-        controllerObj = controller
+    controllerObj = controller
     autoclickerObj = autoclicker
     lobbyInfoObj = lobbyInfo
     chatObj = chat
