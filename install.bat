@@ -41,6 +41,7 @@ cd %~dp0
 :: upgrade pip and install dependecies
 python.exe -m pip install --upgrade pip
 pip install -r requirements.txt
+pip install -U Pillow
 
 :: create folders for installation
 2> nul mkdir %desktopInstallationFolder%
