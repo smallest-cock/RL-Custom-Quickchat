@@ -36,14 +36,17 @@ To give the autoclicker a custom behavior, you can change the value of any of th
 
 |keyword argument | default value | description|
 |---|:---:|---|
-`clickDuration=` | `0` | Amount of time the mouse button is held down on each click (seconds)
-`delayAfterDSM=` | `0.3` | Amount of time to wait after "Disable Safe Mode" is clicked (seconds). Allows time for AlphaConsole plugin & menu UI to load
-`delayBetweenClicks=` | `0` | Amount of time to wait between clicks (seconds)
+`clickDuration=` | `0` | Amount of time (seconds) the mouse button is held down on each click
+`delayAfterDSM=` | `0.3` | Amount of time (seconds) to pause the autoclicker after "Disable Safe Mode" is clicked. Allows time for the AlphaConsole plugin & menu UI to load
+`delayBetweenClicks=` | `0` | Amount of time (seconds) to wait between clicks
 `enableCleanup=` | `True` | Attempt a "clean up" (click remaining buttons on the screen using default image search method) if "fast mode" fails
-`fastModeStartDelay=` | `0.4` | Amount of time to wait before starting a "fast mode" run (seconds). Gives bakkesmod time to reload the AlphaConsole plugin
-`onlyUseCoordsForFastMode=` | `False` | Only use saved coordinates during "fast mode" runs (as opposed to searching for the "Disable Safe Mode" button which uses more CPU)
-`startDelay=` | `0.4` | Amount of time to wait before starting a regular run (seconds). Gives bakkesmod time to reload the AlphaConsole plugin
+`onlyUseCoordsForFastMode=` | `False` | Only use saved coordinates during "fast mode" runs (as opposed to finding the "Disable Safe Mode" button using image search, which uses more CPU)
+`startDelay=` | `0.4` | Amount of time (seconds) to wait before starting the autoclicker. Gives bakkesmod time to reload the AlphaConsole plugin and show the menu
 `startFromImage=` | `1` | The 1st image to start from during an autoclicker run (out of the list of 5 images). Useful if you want to skip certain image(s)
+
+>[!TIP]
+>You may need to increase the value of `delayAfterDSM` on older/slower computers. For example, my laptop takes about 4s to load the AlphaConsole menu after I click "Disable Safe Mode" ... so I use `delayAfterDSM=4`
+
 
 ### Example:
 
@@ -52,7 +55,7 @@ Say you want to manually click the "Disable Safe Mode" button, then have the aut
 You can use something like 
 
 ```python
-enableBallTexture(fastModeStartDelay=3, startFromImage=2)
+enableBallTexture(startDelay=3, startFromImage=2)
 ```
 
-This will make the autoclicker wait for 3 seconds (so you have time to manually click the "Disable Safe Mode" button). Then it will begin autoclicking, starting with the "cosmetics" tab (the 2nd image)
+This will make the autoclicker wait 3 seconds before starting (so you have time to manually click the "Disable Safe Mode" button). Then it will begin autoclicking, starting with the "cosmetics" tab (the 2nd image)
