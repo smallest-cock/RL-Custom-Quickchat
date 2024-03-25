@@ -6,6 +6,7 @@ import speech_recognition as sr
 import pygame
 import json
 import cv2
+import uwuify
 
 
 
@@ -614,7 +615,9 @@ class Chat():
                 elif effectName == 'inQuotes' and value:
                     chat = self.wrapInQuotes(chat)
                 elif effectName == 'quotedAs' and value:
-                    chat = self.quotedAs(chat, value)                
+                    chat = self.quotedAs(chat, value)
+                elif effectName == 'uwu' and value:
+                    chat = uwuify.uwu(chat)                
 
         try:
             for i in range(spamCount):

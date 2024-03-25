@@ -210,6 +210,11 @@ while True:
                     quickchat(lastChat(), quotedAs='sweaty gamer')
                     continue
 
+                # repeat the last chat in UωU text ≽^•⩊•^≼ 👉👈 ( ˶ˆ꒳ˆ˵ ) 👳‍♂️✈🏢🏢
+                elif sequence('right', 'left'):
+                    quickchat(lastChat(), uwu=True)
+                    continue
+
 
     except Exception as e:
         print(e)

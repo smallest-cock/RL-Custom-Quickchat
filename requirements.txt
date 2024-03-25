@@ -5,3 +5,4 @@ pyautogui
 pygame
 setuptools
 SpeechRecognition
+uwuify
