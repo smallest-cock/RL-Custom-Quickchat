@@ -4,6 +4,18 @@
 >See [Autoclicker Usage](./Autoclicker.md) for info about how the autoclicker works (and how to customize it)
 
 
+### If mouse clicks aren't in sync with the menu:
+
+This may be because the default autoclicker settings aren't ideal for your particular PC. But no worries, these autoclicker settings are customizeable! See [Autoclicker optional arguments](./Autoclicker.md#optional-arguments)
+
+For example, if you notice the AlphaConsole menu takes about 1 second to show up after you press the macro, and about 3 seconds to load after "Disable Safe Mode" is clicked, you should probably edit your `enableBallTexture()` function like this
+
+```python
+enableBallTexture(startDelay=1, delayAfterDSM=3)
+```
+
+so the autoclicker can wait until the menu is fully loaded before attempting to click buttons
+
 ### If you have multiple displays:
 
 - Make sure RL is running on the **primary** monitor

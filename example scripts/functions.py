@@ -31,8 +31,8 @@ def variation(variationListName: str) -> str:
 def speechToText() -> str | None:
     return chatObj.speechToText()
 
-def enableBallTexture(onlyUseCoordsForFastMode=False, startDelay=.4, fastModeStartDelay=.4, delayAfterDSM=.3, delayBetweenClicks=0.0, clickDuration=0.0, startFromImage=0, enableCleanup=True):
-    autoclickerObj.enableBallTexture(onlyUseCoordsForFastMode=onlyUseCoordsForFastMode, startDelay=startDelay, fastModeStartDelay=fastModeStartDelay, delayAfterDSM=delayAfterDSM, delayBetweenClicks=delayBetweenClicks, clickDuration=clickDuration, startFromImage=startFromImage, enableCleanup=enableCleanup)
+def enableBallTexture(onlyUseCoordsForFastMode=False, startDelay=.4, delayAfterDSM=.3, delayBetweenClicks=0.0, clickDuration=0.0, startFromImage=0, enableCleanup=True):
+    autoclickerObj.enableBallTexture(onlyUseCoordsForFastMode=onlyUseCoordsForFastMode, startDelay=startDelay, delayAfterDSM=delayAfterDSM, delayBetweenClicks=delayBetweenClicks, clickDuration=clickDuration, startFromImage=startFromImage, enableCleanup=enableCleanup)
 
 def lastChat() -> str | None:
     return lobbyInfoObj.lastChat()
@@ -246,9 +246,9 @@ class Autoclicker:
         self.images.sort(key=lambda elm: elm.index)
 
 
-    def enableBallTexture(self, onlyUseCoordsForFastMode=False, startDelay=.4, fastModeStartDelay=.4, delayAfterDSM=.3, delayBetweenClicks=0, clickDuration=0, startFromImage=0, enableCleanup=True):
+    def enableBallTexture(self, onlyUseCoordsForFastMode=False, startDelay=.4, delayAfterDSM=.3, delayBetweenClicks=0, clickDuration=0, startFromImage=0, enableCleanup=True):
         startTime = time.perf_counter()
-        pyautogui.sleep(fastModeStartDelay if self.fastMode else startDelay)
+        pyautogui.sleep(startDelay)
         pyautogui.move(50, 50)
         try:
             if startFromImage > 1 and self.fastMode:
