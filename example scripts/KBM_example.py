@@ -31,7 +31,7 @@ autoclickerImages = {
     "xButton": 'autoclicker images/x.png'
 }
 
-# Your 'Lobby Info' folder path (found in your bakkesmod data folder)... created when you install the 'Lobby Info' plugin here: https://github.com/smallest-cock/LobbyInfo/releases/tag/latest
+# Your 'Lobby Info' folder path (found in your bakkesmod data folder)... created when you install the 'Lobby Info' plugin here: https://github.com/smallest-cock/LobbyInfo/releases
 lobbyInfoFolderPath = r'C:\Users\<your user account name here>\AppData\Roaming\bakkesmod\bakkesmod\data\Lobby Info'   # <---- edit <your user account name here>
 
 speechToTextEnabled = True

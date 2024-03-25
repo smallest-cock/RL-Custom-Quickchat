@@ -32,7 +32,9 @@ https://youtu.be/G0Lperc-UU0
    
 <br>
 
-**\*\*** Requires the [Lobby Info bakkesmod plugin](https://github.com/smallest-cock/LobbyInfo/releases/tag/latest) 
+**\*\*** Requires the [Lobby Info bakkesmod plugin](https://github.com/smallest-cock/LobbyInfo/releases)
+
+YT video explaining the Lobby Info plugin: https://youtu.be/c6-_n3ge_xw
 
 ## 🛠️ How to install:
 
