@@ -187,7 +187,7 @@ while True:
                     continue                # to customize the autoclicker see https://github.com/smallest-cock/RL-Custom-Quickchat/blob/main/docs/Autoclicker.md#optional-arguments
 
 
-    # --------  to use the features below: install the 'Lobby Info' bakkesmod plugin (see above) & edit 'lobbyInfoFolderPath' appropriately (see above)  ---------
+    # ----------------  to use the features below: install the 'Lobby Info' bakkesmod plugin ... as shown here: https://youtu.be/qRQldwrufY4  --------------------
 
 
                 # expose the last chatter's ranks
