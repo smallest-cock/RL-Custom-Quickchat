@@ -34,7 +34,7 @@ https://youtu.be/G0Lperc-UU0
 
 **\*\*** Requires the [Lobby Info bakkesmod plugin](https://github.com/smallest-cock/LobbyInfo/releases)
 
-YT video explaining the Lobby Info plugin: https://youtu.be/c6-_n3ge_xw
+YT video showcasing the Lobby Info plugin: https://youtu.be/qRQldwrufY4
 
 ## 🛠️ How to install:
 
