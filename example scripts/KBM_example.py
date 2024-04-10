@@ -22,22 +22,10 @@ variations = {
     'taste': ['sweet', 'sour', 'bitter', 'salty', 'rich', 'spicy', 'savory']
 }
 
-# PNG images for autoclicker
-autoclickerImages = {
-    "disableSafeMode": 'autoclicker images/dsm.png',
-    "cosmeticsTab": 'autoclicker images/cosmetics_tab.png',
-    "ballTextureDropdown": 'autoclicker images/ball_texture_dropdown.png',
-    "ballSelection": 'autoclicker images/ball_selection.png',
-    "xButton": 'autoclicker images/x.png'
-}
-
 # Your 'Lobby Info' folder path (found in your bakkesmod data folder)... created when you install the 'Lobby Info' plugin here: https://github.com/smallest-cock/LobbyInfo/releases
 lobbyInfoFolderPath = r'C:\Users\<your user account name here>\AppData\Roaming\bakkesmod\bakkesmod\data\Lobby Info'   # <---- edit <your user account name here>
 
 speechToTextEnabled = True
-
-enableAutoclickerFastMode = True
-autoclickAttemptsPerImage = 20
 
 # Adjusts chat typing speed (seconds per character)
 typingDelay = .002          # 0 makes chats type out instantly (but will cut off long chats)
@@ -61,10 +49,9 @@ chatKeys = {
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 lobbyInfo = LobbyInfo(lobbyInfoFolderPath)
-autoclicker = Autoclicker(autoclickerImages, enableAutoclickerFastMode, autoclickAttemptsPerImage)
 chat = Chat(chatKeys, typingDelay, chatSpamInterval, speechToTextEnabled, variations)
 chat.shuffleVariations()
-syncData(autoclicker=autoclicker, lobbyInfo=lobbyInfo, chat=chat)
+syncData(lobbyInfo=lobbyInfo, chat=chat)
 
 print(f"\n\n~~~~~~~~~~~~~~ KBM version ~~~~~~~~~~~~~~\n\nwaiting for quickchat inputs....\n\n")
 
@@ -127,10 +114,6 @@ while True:
             elif press('pagedown'): 
                 quickchat(speechToText(), chatMode='team')
                 continue
-
-            elif press('pageup'):
-                enableBallTexture()         # <--- autoclick things in AlphaConsole menu to enable ball texture
-                continue                    # to customize the autoclicker see https://github.com/smallest-cock/RL-Custom-Quickchat/blob/main/docs/Autoclicker.md#optional-arguments
 
 
     # ----------------  to use the features below: install the 'Lobby Info' bakkesmod plugin ... as shown here: https://youtu.be/qRQldwrufY4  --------------------

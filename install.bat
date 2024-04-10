@@ -33,7 +33,6 @@ if errorlevel 4 set scriptName="KBM_example.py"
 cls
 
 set desktopInstallationFolder="%USERPROFILE%\Desktop\Quickchats Script"
-set autoclickerImagesFolder="%USERPROFILE%\Desktop\Quickchats Script\autoclicker images"
 
 :: change current working directory to the repo folder (for when running as admin)
 cd %~dp0
@@ -41,16 +40,13 @@ cd %~dp0
 :: upgrade pip and install dependecies
 python.exe -m pip install --upgrade pip
 pip install -r requirements.txt
-pip install -U Pillow
 
 :: create folders for installation
 2> nul mkdir %desktopInstallationFolder%
-2>nul mkdir %autoclickerImagesFolder%
 
 :: copy everything to installation folder on desktop
 copy /v /y "example scripts\%scriptName%" %desktopInstallationFolder%
 copy /v /y "example scripts\functions.py" %desktopInstallationFolder%
-copy /v /y "custom ball texture stuff\autoclicker images\*.png" %autoclickerImagesFolder%
 
 cls
 

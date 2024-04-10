@@ -13,12 +13,10 @@ https://youtu.be/G0Lperc-UU0
 ## ✨ Features
 
 - Custom quick chats
-- Custom ball textures in online matches
-  - [Video tutorial](https://youtu.be/qjvJxKlpNx0)
-- Speech-to-text chats
-  - [Video demo](https://youtu.be/cqEdJQ-X7X4)
 - Expose people's ranks in chat **\*\***
 - Parrot people's chats (with optional added effects such as sArCAsM tExT) **\*\***
+- Speech-to-text chats
+  - [Video demo](https://youtu.be/cqEdJQ-X7X4)
 - KBM version
 - Create button combination macros (Circle + Up) or button sequence macros (Left → Down)
   - Button combo macros will work with any amount of buttons (e.g. L1 + Up + Square + R1)
@@ -69,8 +67,7 @@ https://youtu.be/qdeey4lyZo0
 
 - [Troubleshooting page](./docs/Troubleshooting.md) — common errors and fixes
 
-- [Autoclicker usage guide](./docs/Autoclicker.md) — info about how the autoclicker works and how to customize it
 
 ## 🙏 Support
 
-[Drop a tip 🍯](https://cash.app/$naptime559)
+[Buy me a coffee ☕](https://cash.app/$naptime559)
