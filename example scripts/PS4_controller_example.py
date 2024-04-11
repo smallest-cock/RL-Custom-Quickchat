@@ -102,6 +102,11 @@ while True:
                     quickchat('let me cook')
                     continue
 
+                # on left → right (while pressing triangle) types "this sequence only activates while holding down triangle"
+                elif combine('triangle', sequence=('left', 'right')):      # <--- the sequence part can only be 2 buttons!
+                    quickchat('this sequence only activates while holding down triangle')
+                    continue
+
                 # on square + left, types "dont lose this kickoff" (spamming 2 times)
                 elif combine('square', 'left'):
                     quickchat('dont lose this kickoff', spamCount=2)  # <-- the '2' is how many times the chat will be spammed.. the max you can put is 3 (before RL gives a chat timeout)

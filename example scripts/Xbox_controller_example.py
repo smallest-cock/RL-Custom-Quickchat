@@ -99,6 +99,11 @@ while True:
                 elif sequence('up', 'left'):    # <--- sequence(...) can only take 2 buttons!
                     quickchat('let me cook')
                     continue
+
+                # on left → right (while pressing Y) types "this sequence only activates while holding down Y"
+                elif combine('y', sequence=('left', 'right')):      # <--- the sequence part can only be 2 buttons!
+                    quickchat('this sequence only activates while holding down Y')
+                    continue
                 
                 # on X + left, types "dont lose this kickoff" (spamming 2 times)
                 elif combine('x', 'left'):

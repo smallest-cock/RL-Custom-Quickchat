@@ -15,8 +15,8 @@ import uwuify
 def toggleMacros(button: str):
     controllerObj.toggleMacros(button)
 
-def combine(*buttons) -> bool:
-    return controllerObj.combine(*buttons)
+def combine(*buttons, sequence=None):
+    return controllerObj.combine(*buttons, sequence=sequence)
 
 def sequence(b1: str, b2: str) -> bool:
     return controllerObj.sequence(b1, b2)
@@ -89,9 +89,11 @@ class Controller:
         self.name: str = ""
         self.macrosOn: bool = True
         self.pressedButtons: list = []
-        self.firstButtonPressed: dict = {
-            'button': None,
-            'time': 420
+        self.firstButtonsPressed: dict = {
+            'global': {
+                'button': None,
+                'time': 420
+            }
         }
 
     def getPygameEvent(self):
@@ -145,8 +147,8 @@ class Controller:
         #     print("pressedButtons:", pressedButtons)
         self.pressedButtons = pressedButtons
 
-    def resetFirstButtonPressed(self):
-        self.firstButtonPressed = {
+    def resetFirstButtonPressed(self, key='global'):
+        self.firstButtonsPressed[key] = {
             'button': None,
             'time': 420
         }
@@ -158,38 +160,78 @@ class Controller:
             self.clearPygameEventQueue()
             time.sleep(.2)
 
-    def combine(self, *buttons) -> bool:
-        for button in buttons:
-            if button not in self.pressedButtons:
-                return False
-        self.resetFirstButtonPressed()
-        self.clearPygameEventQueue()
-        return True
-
     def sequence(self, button1, button2) -> bool:
         button1Pressed = button1 in self.pressedButtons
         button2Pressed = button2 in self.pressedButtons
         if button1Pressed or button2Pressed:
             functionCallTime = time.time()
-            if self.firstButtonPressed['button'] == None:
+            if self.firstButtonsPressed['global']['button'] == None:
                 if button1Pressed:
-                    self.firstButtonPressed['time'] = functionCallTime
-                    self.firstButtonPressed['button'] = button1
+                    self.firstButtonsPressed['global']['time'] = functionCallTime
+                    self.firstButtonsPressed['global']['button'] = button1
             else:
-                if functionCallTime > (self.firstButtonPressed['time'] + self.macroTimeWindow):   # if button was pressed after (outside) the macro time window
+                if functionCallTime > (self.firstButtonsPressed['global']['time'] + self.macroTimeWindow):   # if button was pressed after (outside) the macro time window
                     if button1Pressed:
-                        self.firstButtonPressed['time'] = functionCallTime
-                        self.firstButtonPressed['button'] = button1
+                        self.firstButtonsPressed['global']['time'] = functionCallTime
+                        self.firstButtonsPressed['global']['button'] = button1
                     else:
                         self.resetFirstButtonPressed()
                 else:                                                                   # if button was pressed within the macro time window
                     if button2Pressed:
-                        if button1 == self.firstButtonPressed['button']:
-                            if (functionCallTime > (self.firstButtonPressed['time'] + 0.05)):
+                        if button1 == self.firstButtonsPressed['global']['button']:
+                            if (functionCallTime > (self.firstButtonsPressed['global']['time'] + 0.05)):
                                 self.resetFirstButtonPressed()
                                 self.clearPygameEventQueue()
                                 return True
         return False
+
+    def combine(self, *buttons, sequence=None):
+        for button in buttons:
+            if button not in self.pressedButtons:
+                return False
+            
+        if sequence:
+            comboID = ''
+            for button in buttons:
+                comboID += button
+            # print(f'this is the comboID: {comboID}')        # uncomment to see the key used for the unique firstButtonPressed dict
+
+            # if it doesnt already exist, create firstButtonPressed dict with comboID as key
+            if not comboID in self.firstButtonsPressed.keys():
+                self.resetFirstButtonPressed(comboID)
+
+            # normal sequence functionality, but using a unique firstButtonPressed dict
+            button1 = sequence[0]
+            button2 = sequence[1]
+            button1Pressed = button1 in self.pressedButtons
+            button2Pressed = button2 in self.pressedButtons
+            if button1Pressed or button2Pressed:
+                functionCallTime = time.time()
+                if self.firstButtonsPressed[comboID]['button'] == None:
+                    if button1Pressed:
+                        self.firstButtonsPressed[comboID]['time'] = functionCallTime
+                        self.firstButtonsPressed[comboID]['button'] = button1
+                else:
+                    if functionCallTime > (self.firstButtonsPressed[comboID]['time'] + self.macroTimeWindow):   # if button was pressed after (outside) the macro time window
+                        if button1Pressed:
+                            self.firstButtonsPressed[comboID]['time'] = functionCallTime
+                            self.firstButtonsPressed[comboID]['button'] = button1
+                        else:
+                            self.resetFirstButtonPressed(comboID)
+                    else:                                                                   # if button was pressed within the macro time window
+                        if button2Pressed:
+                            if button1 == self.firstButtonsPressed[comboID]['button']:
+                                if (functionCallTime > (self.firstButtonsPressed[comboID]['time'] + 0.05)):
+                                    # clear both global and unique firstButtonPressed dicts ... to "start fresh" after the macro is triggered
+                                    self.resetFirstButtonPressed(comboID)
+                                    self.resetFirstButtonPressed()
+                                    self.clearPygameEventQueue()
+                                    return True
+            return False
+        else:
+            self.resetFirstButtonPressed()
+            self.clearPygameEventQueue() 
+            return True
 
 
 
